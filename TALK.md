@@ -15,7 +15,15 @@ _Jonathan B. Coe & Antony Peacock_
 
 ---
 
-## Allocators
+## Allocating memory
+
+---
+
+### Managing memory with `new` and `delete`
+
+---
+
+### Managing memory with allocators
 
 ---
 
