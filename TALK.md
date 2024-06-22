@@ -7,7 +7,7 @@ size: 16:9
 
 # Allocators for C++ vocabulary types
 
-_Jonathan B. Coe & Antony Peacock_
+<i>Jonathan B. Coe & Antony Peacock</i>
 
 ---
 
@@ -115,6 +115,7 @@ dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) noexcept {
     other.ptr = nullptr;
 }
 ```
+---
 
 ## Assignment Operators
 
@@ -138,6 +139,8 @@ dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
     return *this;
 }
 ```
+
+---
 
 ## Observers
 
@@ -218,6 +221,74 @@ Allocators allow us to customize object creation and destruction, and memory all
 
 ---
 
+## C++03 allocators [Bob's slide]
+
+Pointers were always `T*`.
+
+Implementations assumed that allocators were stateless as instances always compared equal and could be considered interchangeable.
+
+Shared memory data structures could not be readily implemented with standard library containers.
+
+Scoped allocation was very difficult: `map<string, vector<string>>`
+
+---
+
+## C++11 and beyond [Bob's slide]
+
+_nullablepointer.requirements_
+
+_allocator.requirements_
+
+_pointer.traits_
+
+_allocator.traits_
+
+_allocator.adaptor_
+
+_container.requirements.general_ [Allocator-aware containers] N4687
+
+Containers use the `allocator_traits` template to get information about the allocator.
+
+## Allocators
+
+_The basic purpose of an allocator is to provide a source of memory for a given
+type, and a place to return that memory to once it is no longer needed._
+
+<sub>-Bjarne Stroustrup, The C++ Programming Language, 4th Edition</sub>
+
+Allocators were part of Stepanov's original STL design. 
+
+They provide a more granular way to manage memory than `new` and `delete`.
+
+Allocators separate allocation and construction, and deallocation and destruction.
+
+---
+
+## Why write an allocator?
+
+* Performance
+  * Stack allocation
+  * Container-specific memory pools
+  * Thread-local allocation (lock-free)
+  * Memory pools
+  * Arena allocation
+
+* Debugging / Instrumentation / Testing
+
+* Relocatable data
+
+* Shared memory
+  
+<sub>Thanks to Bob Steagall (cppcon 2017) for collating the above list.</sub>
+
+---
+
+## Allocator rebinding
+
+TODO
+
+---
+
 ## Allocators: The Hawaiian Lego Analogy
 
 TODO
@@ -240,7 +311,71 @@ class dyn_optional;
 
 ---
 
-## Propagating allocators
+## Allocator propagation [Bob's slide]
+
+Lateral: Copy/move construction, copy/move assignment, swap.
+controlled by allocator propagation traits
+
+Deep: Nesting the allocator of the outermost container in a container heirarchy.
+scoped_allocator_adaptor helps with this
+
+---
+
+## Allocator traits [Bob's slide]
+
+Gets information about an allocator and provides it to a container.
+
+Provides typedefs.
+
+Provides construct and destroy functions if not speficied by the allocator.
+
+Assumes propagation traits are false unless overridden.
+
+Assumes that allocators compare equal if empty.
+
+---
+
+## Minimal allocator
+
+```cpp
+template <typename T>
+struct minimal_allocator {
+    using value_type = T;
+
+    minimal_allocator(PARAMS);
+    
+    template<typename U> minimal_allocator(const minimal_allocator<U>&);
+
+    T* allocate(std::size_t);
+
+    void deallocate(T*, std::size_t);
+
+    friend bool operator==(const minimal_allocator&, const minimal_allocator&);
+};
+
+```
+
+---
+
+## PMR allocators
+
+Runtime polymorphism using a `pmr::memory_resource` base class.
+
+PMR Allocators stick to the container, they do not propagate.
+
+`pmr::polymorphic_allocator` wraps a `pmr::memory_resource` and provides the allocator interface.
+
+The memory resource must outlive the allocators that use it.
+
+---
+
+## swap
+
+Standard requires container iterators to be valid after a swap => UB in swap.
+
+---
+
+## `select_on_container_copy_construction`
 
 ---
 
@@ -255,3 +390,19 @@ class dyn_optional;
 ## Allocators and C++ vocabulary types
 
 ---
+
+## Acknowledgements
+
+Thanks to:
+
+* Nina Ranns for fielding our regular questions on allocators.
+
+* Bob Steagall for his excellent cppcon 2017 talk on allocators.
+
+* Joshua Berne for pair-debugging our early implementation of `polymorphic`.
+
+* Neelofer Banglawala for her help with the slides.
+
+* Assorted members of the C++ community for their ongoing work on allocators.
+
+We've been the grateful recipients of a great deal of wisdom. Mistakes are our own.
