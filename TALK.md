@@ -17,13 +17,14 @@ size: 16:9
 
 ## Our new type: `dyn_optional`
 
-We'll work on a new type, `dyn_optional`, for our examples.
+We will work on a new type, `dyn_optional`, for the examples in this talk.
 
-`dyn_optional`, like `std::optional`, is a type that can hold a value or be empty.
+Similar to `std::optional`, `dyn_optional` is a type that can hold a value or be empty.
 
 When `dyn_optional` is non-empty, the value is stored in dynamic memory.
 
-There are not a host of good reasons to use `dyn_optional` but it should be simple enough for our examples.
+There are not many good reasons to use `dyn_optional`, however it is simple enough for 
+the examples we will cover.
 
 ---
 
