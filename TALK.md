@@ -13,9 +13,11 @@ size: 16:9
 
 ## Outline
 
-1. Creating a new type: `dyn_optional`.
-1. Implementing our new type.
+1. Our standardization journey.
+1. A simple new type: `dyn_optional`.
+1. Implementing `dyn_optional`
 1. Introducing allocators.
+1. A Lego analogy for allocators.
 1. Allocator traits.
 1. Allocator propagation.
 1. Why `dyn_optional` needs an allocator.
@@ -23,15 +25,36 @@ size: 16:9
 
 ---
 
-## Our new type: `dyn_optional`
+## Adding `indirect` and `polymorphic` to the C++ standard
+
+Along with Antony Peacock, I've been working on adding `indirect` and `polymorphic` to the C++ standard.
+
+These two class templates are designed to be used for member data in composite
+types.
+
+An instance of `indirect<T>` owns an object of class `T`.
+
+An instance of `polymorphic<T>` owns an object of class `T` or a class derived
+from `T`.
+
+We've added allocator support to `indirect` and `polymorphic`.
+
+Work on `indirect` and `polymorphic` progresses at
+https://github.com/jbcoe/value_types
+
+---
+
+## A simple new type: `dyn_optional`
 
 We'll work on a new type, `dyn_optional`, for our examples.
 
-`dyn_optional`, like `std::optional`, is a type that can hold a value or be empty.
+`dyn_optional`, like `std::optional`, is a type that can hold a value or be
+empty.
 
 When `dyn_optional` is non-empty, the value is stored in dynamic memory.
 
-There are not a host of good reasons to use `dyn_optional` but it should be simple enough for our examples.
+There are not a host of good reasons to use `dyn_optional` but it should be
+simple enough for our examples.
 
 ---
 
@@ -123,6 +146,7 @@ dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) noexcept {
     other.ptr = nullptr;
 }
 ```
+
 ---
 
 ## Assignment Operators
@@ -223,11 +247,90 @@ dyn_optional<T>::~dyn_optional() {
 
 We've used `new` to allocate memory for the value in `dyn_optional` and `delete` to deallocate it.
 
-This seems neat enough but I've heard talk of things called allocators.
+We want to use allocators to allocate and deallocate memory as they offer more control and flexibility.
 
 Allocators allow us to customize object creation and destruction, and memory allocation and deallocation.
 
 ---
+
+## Allocators
+
+_The basic purpose of an allocator is to provide a source of memory for a given
+type, and a place to return that memory to once it is no longer needed._
+
+<sub>-Bjarne Stroustrup, The C++ Programming Language, 4th Edition</sub>
+
+They provide a more granular way to manage memory than `new` and `delete`.
+
+Allocators separate allocation and construction, and deallocation and destruction.
+
+---
+
+## Why would we want to use an allocator?
+
+TODO
+
+–––
+
+## A brief history of allocators
+
+TODO
+
+---
+
+## Allocators: The Lego Analogy
+
+While working on `indirect` and `polymorphic`, we came up with an analogy that made us re-think our code.
+
+* Imagine that you're building a Lego model.
+
+* The allocator is the box of Lego bricks that you use to build the model.
+
+* Bricks (memory) are taken from the box and used to build (construct) the model.
+
+* When the model is taken apart, the bricks are returned to the box.
+
+---
+
+## Allocators: The Lego Analogy II: A common pile of bricks
+
+With the default allocator, bricks come from a common pile (heap).
+
+![mixed-lego](images/multi-lego.jpeg)
+
+---
+
+## Allocators: The Lego Analogy III: Sorted bricks
+
+With a custom allocator, bricks come from a specific box.
+
+![sorted-lego](images/sorted-lego.jpeg)
+
+---
+
+## Allocators: The Lego Analogy IV: Scoped allocators
+
+When we add more complexity to the model, we need more bricks.
+
+We can use a different box for the new bricks or we can use the same box as the original model.
+
+This maps rather neatly onto the idea of scoped allocators where a heirarchy of containers use the same allocator as the outermost container.
+
+---
+
+## Allocators: The Lego Analogy V: Allocator propagation
+
+When we copy a model, we can use the same box of bricks or we can use a
+different box.
+
+Perhaps you're copying your friend's red house and need to use your supply of red bricks.
+
+Whatever happens, we need to be sure that when the models are taken apart, the
+bricks are returned to the box they originally came from.
+
+---
+
+
 
 ## C++03 allocators [Bob's slide]
 
@@ -257,20 +360,6 @@ _container.requirements.general_ [Allocator-aware containers] N4687
 
 Containers use the `allocator_traits` template to get information about the allocator.
 
-## Allocators
-
-_The basic purpose of an allocator is to provide a source of memory for a given
-type, and a place to return that memory to once it is no longer needed._
-
-<sub>-Bjarne Stroustrup, The C++ Programming Language, 4th Edition</sub>
-
-Allocators were part of Stepanov's original STL design. 
-
-They provide a more granular way to manage memory than `new` and `delete`.
-
-Allocators separate allocation and construction, and deallocation and destruction.
-
----
 
 ## Why write an allocator?
 
@@ -288,18 +377,6 @@ Allocators separate allocation and construction, and deallocation and destructio
 * Shared memory
   
 <sub>Thanks to Bob Steagall (cppcon 2017) for collating the above list.</sub>
-
----
-
-## Allocator rebinding
-
-TODO
-
----
-
-## Allocators: The Hawaiian Lego Analogy
-
-TODO
 
 ---
 
