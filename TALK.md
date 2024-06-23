@@ -5,23 +5,20 @@ paginate: true
 size: 16:9
 ---
 
-# Allocators for C++ vocabulary types
+# Allocators for C++ Vocabulary Types
 
-<i>Jonathan B. Coe & Antony Peacock</i>
+_Jonathan B. Coe & Antony Peacock_
 
 ---
 
 ## Outline
 
-1. Our standardization journey.
+1. Adding new types to the C++ standard.
 1. A simple new type: `dyn_optional`.
 1. Implementing `dyn_optional`
 1. Introducing allocators.
 1. A Lego analogy for allocators.
-1. Allocator traits.
-1. Allocator propagation.
-1. Why `dyn_optional` needs an allocator.
-1. Adding an allocator to `dyn_optional`.
+1. Adding allocator support to `dyn_optional`.
 
 ---
 
@@ -258,7 +255,7 @@ Allocators allow us to customize object creation and destruction, and memory all
 _The basic purpose of an allocator is to provide a source of memory for a given
 type, and a place to return that memory to once it is no longer needed._
 
-<sub>-Bjarne Stroustrup, The C++ Programming Language, 4th Edition</sub>
+###### Bjarne Stroustrup, The C++ Programming Language, 4th Edition
 
 They provide a more granular way to manage memory than `new` and `delete`.
 
@@ -330,9 +327,53 @@ bricks are returned to the box they originally came from.
 
 ---
 
+## Adding an allocator to dyn_optional
 
+We could make an allocator part of `dyn_optional` and use the allocator to allocate and deallocate memory.
 
-## C++03 allocators [Bob's slide]
+A user could then specify the allocator they want to use when they create a `dyn_optional`.
+
+We add the allocator as a second template parameter to `dyn_optional`. By default we use `std::allocator` so that if a
+user doesn't specify an allocator, we use the standard allocator just like other standard library types.
+
+```cpp
+template <typename T, typename Allocator = std::allocator<T>>
+class dyn_optional;
+```
+
+---
+
+## Allocator traits
+
+TODO
+
+---
+
+## Making `dyn_optional` allocator-aware
+
+TODO
+
+---
+
+## Allocator-extended constructors
+
+TODO
+
+---
+
+## Allocator propagation
+
+TODO
+
+---
+
+## `swap` in the presence of allocators
+
+TODO
+
+---
+
+## TODO(REMOVE): C++03 allocators [Bob's slide]
 
 Pointers were always `T*`.
 
@@ -344,7 +385,7 @@ Scoped allocation was very difficult: `map<string, vector<string>>`
 
 ---
 
-## C++11 and beyond [Bob's slide]
+## TODO(REMOVE): C++11 and beyond [Bob's slide]
 
 _nullablepointer.requirements_
 
@@ -361,7 +402,7 @@ _container.requirements.general_ [Allocator-aware containers] N4687
 Containers use the `allocator_traits` template to get information about the allocator.
 
 
-## Why write an allocator?
+## TODO(REMOVE): Why write an allocator?
 
 * Performance
   * Stack allocation
@@ -380,23 +421,7 @@ Containers use the `allocator_traits` template to get information about the allo
 
 ---
 
-## Adding an allocator to dyn_optional
-
-We could make an allocator part of `dyn_optional` and use the allocator to allocate and deallocate memory.
-
-A user could then specify the allocator they want to use when they create a `dyn_optional`.
-
-We add the allocator as a second template parameter to `dyn_optional`. By default we use `std::allocator` so that if a
-user doesn't specify an allocator, we use the standard allocator just like other standard library types.
-
-```cpp
-template <typename T, typename Allocator = std::allocator<T>>
-class dyn_optional;
-```
-
----
-
-## Allocator propagation [Bob's slide]
+## TODO(REMOVE): Allocator propagation [Bob's slide]
 
 Lateral: Copy/move construction, copy/move assignment, swap.
 controlled by allocator propagation traits
@@ -406,7 +431,7 @@ scoped_allocator_adaptor helps with this
 
 ---
 
-## Allocator traits [Bob's slide]
+## TODO(REMOVE): Allocator traits [Bob's slide]
 
 Gets information about an allocator and provides it to a container.
 
@@ -420,7 +445,7 @@ Assumes that allocators compare equal if empty.
 
 ---
 
-## Minimal allocator
+## TODO(REMOVE): Minimal allocator
 
 ```cpp
 template <typename T>
@@ -442,7 +467,7 @@ struct minimal_allocator {
 
 ---
 
-## PMR allocators
+## TODO(REMOVE): PMR allocators
 
 Runtime polymorphism using a `pmr::memory_resource` base class.
 
@@ -454,17 +479,13 @@ The memory resource must outlive the allocators that use it.
 
 ---
 
-## swap
+## TODO(REMOVE): swap
 
 Standard requires container iterators to be valid after a swap => UB in swap.
 
 ---
 
-## `select_on_container_copy_construction`
-
----
-
-## Scoped allocators
+## TODO(REMOVE): Scoped allocators
 
 Container passes its allocator to the constructor of the elements that it constructs.
 
@@ -474,11 +495,9 @@ Adding `using allocator_type = Allocator;` to a class makes it allocator-aware a
 
 ---
 
-## Allocator-extended constructors
-
----
-
 ## Allocators and C++ vocabulary types
+
+TODO
 
 ---
 
