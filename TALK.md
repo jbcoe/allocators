@@ -24,7 +24,7 @@ _Jonathan B. Coe & Antony Peacock_
 
 ## Adding `indirect` and `polymorphic` to the C++ standard
 
-Along with Antony Peacock, I've been working on adding `indirect` and `polymorphic` to the C++ standard.
+We've been working on adding `indirect` and `polymorphic` to the C++ standard.
 
 These two class templates are designed to be used for member data in composite
 types.
