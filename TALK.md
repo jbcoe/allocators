@@ -13,6 +13,14 @@ size: 16:9
 
 ## Outline
 
+1. Creating a new type: `dyn_optional`.
+1. Implementing our new type.
+1. Introducing allocators.
+1. Allocator traits.
+1. Allocator propagation.
+1. Why `dyn_optional` needs an allocator.
+1. Adding an allocator to `dyn_optional`.
+
 ---
 
 ## Our new type: `dyn_optional`
@@ -37,7 +45,7 @@ private:
   public:
     // Constructors
     dyn_optional() noexcept;
-    dyn_optional(T const& value);
+    template <typename ...Us> dyn_optional(Us&& ...us);
 
     // Copy and move constructors
     dyn_optional(const dyn_optional& other);
@@ -88,9 +96,9 @@ dyn_optional<T>::dyn_optional() noexcept
 ```
 
 ```cpp
-template <typename T>
-dyn_optional<T>::dyn_optional(const T& t) noexcept
-    : ptr(new T(t)) {}
+template <typename T, typename ...Us>
+dyn_optional<T>::dyn_optional(Us&& ...us);
+    : ptr(new T(std::forward<Us>(us)...)) {}
 ```
 
 ---
@@ -380,6 +388,12 @@ Standard requires container iterators to be valid after a swap => UB in swap.
 ---
 
 ## Scoped allocators
+
+Container passes its allocator to the constructor of the elements that it constructs.
+
+<sub>Thanks to Pablo Halpern and Alisdair Meredith for their excellent cppcon2019 talk</sub>
+
+Adding `using allocator_type = Allocator;` to a class makes it allocator-aware and allows it to support scoped allocators.
 
 ---
 
