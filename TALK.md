@@ -138,10 +138,9 @@ dyn_optional<T>::dyn_optional(const dyn_optional<T>& other) noexcept {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) noexcept {
-    ptr = other.ptr;
-    other.ptr = nullptr;
-}
+dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) noexcept
+: ptr(std::exchange(other.ptr, nullptr))
+{}
 ```
 
 ---
@@ -163,8 +162,7 @@ template <typename T>
 dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
     if(this==&other) return *this;
     delete ptr;
-    ptr = nullptr;
-    std::swap(ptr, other.ptr);
+    ptr = std::exchange(other.ptr, nullptr);
     return *this;
 }
 ```
@@ -401,6 +399,48 @@ _container.requirements.general_ [Allocator-aware containers] N4687
 
 Containers use the `allocator_traits` template to get information about the allocator.
 
+---
+
+## OPTIONAL(REMOVE): Nullable Pointer - Exposition only
+
+```cpp
+template <typename T>
+concept NullablePointer = requires(T t) {
+    requires std::default_initializable<T>;
+    requires std::copy_constructible<T>;
+    requires std::assignable_from<T&, T>;
+    requires std::destructible<T>;
+    requires std::equality_comparable<T>;
+    requires std::equality_comparable_with<T, std::nullptr_t>;
+    requires std::swappable<T>;
+    { T(nullptr) } -> std::same_as<T>;
+    { t = nullptr } -> std::same_as<T&>;
+};
+```
+
+---
+
+## OPTIONAL(REMOVE): Allocator (C++20/23) - Exposition only
+
+```cpp
+template <template <typename> class A, typename T>
+concept Allocator = requires(A<T> a, typename std::allocator_traits<A<T>>::size_type s, typename std::allocator_traits<A<T>>::pointer p) {
+    requires std::same_as<typename A<T>::value_type, T>;
+    requires NullablePointer<typename std::allocator_traits<A<T>>::pointer>;
+    requires NullablePointer<typename std::allocator_traits<A<T>>::const_pointer>;
+    requires std::unsigned_integral<typename std::allocator_traits<A<T>>::size_type>;
+    requires std::signed_integral<typename std::allocator_traits<A<T>>::difference_type>;
+
+    { a.allocate(s) } -> std::same_as<typename std::allocator_traits<A<T>>::pointer>;
+    { a.deallocate(p, s) } -> std::same_as<void>;
+
+#if (__cpp_lib_allocate_at_least >= 202302L )
+    { a.allocate_at_least(s) } -> std::same_as<std::allocation_result<typename std::allocator_traits<A<T>>::pointer, typename std::allocator_traits<A<T>>::size_type>>;
+#endif
+};
+```
+
+---
 
 ## TODO(REMOVE): Why write an allocator?
 
@@ -457,6 +497,9 @@ struct minimal_allocator {
     template<typename U> minimal_allocator(const minimal_allocator<U>&);
 
     T* allocate(std::size_t);
+#if (__cpp_lib_allocate_at_least >= 202302L )
+    T* allocate_at_least(std::size_t);
+#endif
 
     void deallocate(T*, std::size_t);
 
