@@ -5,6 +5,7 @@ paginate: true
 size: 16:9
 ---
 
+<!-- paginate: false -->
 ![bg contain](images/title-slide.png)
 
 ---
@@ -57,8 +58,9 @@ simple enough for our examples.
 ```cpp
 template <typename T>
 class dyn_optional {
-private:
+  private:
     T* ptr;
+
   public:
     // Constructors
     dyn_optional() noexcept;
@@ -76,8 +78,6 @@ private:
 ```
 
 ---
-
-## Class definition (continued)
 
 ```cpp
     ...
@@ -252,9 +252,9 @@ Allocators allow us to customize object creation and destruction, and memory all
 _The basic purpose of an allocator is to provide a source of memory for a given
 type, and a place to return that memory to once it is no longer needed._
 
-###### Bjarne Stroustrup, The C++ Programming Language, 4th Edition
+<small>Bjarne Stroustrup, The C++ Programming Language, 4th Edition</small>
 
-They provide a more granular way to manage memory than `new` and `delete`.
+Allocators provide a more granular way to manage memory than `new` and `delete`.
 
 Allocators separate allocation and construction, and deallocation and destruction.
 
@@ -264,69 +264,86 @@ Allocators separate allocation and construction, and deallocation and destructio
 
 TODO
 
-–––
-
-## A brief history of allocators
-
-TODO
-
 ---
 
-## Allocators: The Lego Analogy
+## The Lego Analogy
+
+![bg right](images/Ant1.jpeg)
 
 While working on `indirect` and `polymorphic`, we came up with an analogy that made us re-think our code.
 
-* Imagine that you're building a Lego model.
+Imagine that you're building a Lego model.
 
-* The allocator is the box of Lego bricks that you use to build the model.
-
-* Bricks (memory) are taken from the box and used to build (construct) the model.
-
-* When the model is taken apart, the bricks are returned to the box.
+The allocator is the box of Lego bricks that you use to build the model.
 
 ---
 
-## Allocators: The Lego Analogy II: A common pile of bricks
+## The Lego Analogy II: A common pile of bricks
 
 With the default allocator, bricks come from a common pile (heap).
 
-![mixed-lego](images/multi-lego.jpeg)
+Bricks come out of the pile to build a model and go back into the pile when a model is taken apart.
+
+![bg left](images/multi-lego.jpeg)
 
 ---
 
-## Allocators: The Lego Analogy III: Sorted bricks
+## The Lego Analogy III: Sorted bricks
 
 With a custom allocator, bricks come from a specific box.
 
-![sorted-lego](images/sorted-lego.jpeg)
+Red bricks come out of the red box and go back into the red box.
+
+![bg right](images/sorted-lego.jpeg)
 
 ---
 
-## Allocators: The Lego Analogy IV: Scoped allocators
+## The Lego Analogy IV: Scoped allocators
 
-When we add more complexity to the model, we need more bricks.
+When we add more complexity to the model, for instance another turret on our castle, we need more bricks.
 
 We can use a different box for the new bricks or we can use the same box as the original model.
 
-This maps rather neatly onto the idea of scoped allocators where a heirarchy of containers use the same allocator as the outermost container.
+With scoped allocators, a heirarchy of containers uses the same allocator as the outermost container.
+
+![bg left](images/lego-castle.png)
 
 ---
 
-## Allocators: The Lego Analogy V: Allocator propagation
+## The Lego Analogy V: Allocator propagation
 
 When we copy a model, we can use the same box of bricks or we can use a
 different box.
 
 Perhaps you're copying your friend's red house and need to use your supply of red bricks.
 
-Whatever happens, we need to be sure that when the models are taken apart, the
-bricks are returned to the box they originally came from.
+We must sure that when the models are taken apart, the bricks are returned to the correct box.
+
+![bg right](images/two-houses.png)
+
+---
+
+## A brief history of allocators
+
+Allocators were added to C++ as part of the STL to allow custom memory
+management.
+
+```cpp
+std::vector<T, A=std::allocator<T>>
+```
+
+Before C++11, an allocator was a lightweight handle to a set of member functions
+that affected how an object was constructed and destroyed, and how memory was
+allocated and deallocated from some global resource.
+
+C++11 introduced a more sophisticated model of allocators where allocators could
+contain state and were interacted with through allocator traits.
 
 ---
 
 ## Adding an allocator to dyn_optional
 
-We could make an allocator part of `dyn_optional` and use the allocator to allocate and deallocate memory.
+We make an allocator part of `dyn_optional` and use the allocator to allocate and deallocate memory.
 
 A user could then specify the allocator they want to use when they create a `dyn_optional`.
 
@@ -342,13 +359,36 @@ class dyn_optional;
 
 ## Allocator traits
 
-TODO
+We'll interact with an allocator using allocator traits.
+
+```cpp
+Allocator allocator; // An instance of the allocator
+using allocator_traits = std::allocator_traits<Allocator>;
+
+// Allocate memory and construct an object.
+auto memory = allocator_traits::allocate(allocator, 1);
+allocator_traits::construct(allocator, memory, std::forward<Us>(us)...);
+
+// Destroy an object and deallocate memory.
+allocator_traits::destroy(allocator, memory);
+allocator_traits::deallocate(allocator, memory, 1);
+```
+
+See https://en.cppreference.com/w/cpp/memory/allocator_traits for more information.
 
 ---
 
 ## Making `dyn_optional` allocator-aware
 
-TODO
+For scoped allocator support, a container needs to know if the objects it constructs need to be constructed with an allocator.
+
+Types can advertise their allocator support by adding using declaration to their class definition:
+
+```cpp
+using allocator_type = Allocator;
+```
+
+Note that this is not a convenience but a requirement for scoped allocator support.
 
 ---
 
@@ -367,6 +407,91 @@ TODO
 ## `swap` in the presence of allocators
 
 TODO
+
+---
+
+## Class definition with allocators
+
+Add an allocator template argument to `dyn_optional`.
+
+Add allocator-extended constructors.
+
+```cpp
+template <typename T, typename Allocator = std::allocator<T>>
+class dyn_optional {
+private:
+    T* ptr;
+    [[no_unique_address]] Allocator allocator;
+
+public:
+    // Constructors
+    dyn_optional() noexcept;
+    template <typename ...Us> dyn_optional(Us&& ...us);
+
+    // Allocator-extended constructors
+    dyn_optional(std::allocator_arg_t, Allocator const& a) noexcept;
+    template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
+```
+
+`[no_unique_address]` is a C++20 attribute that ensures that our object does not
+increase in size when the allocator is stateless.
+
+---
+
+Add allocator-extended constructors.
+
+```cpp
+    // Copy and move constructors
+    dyn_optional(const dyn_optional& other);
+    dyn_optional(dyn_optional&& other);
+
+    // Allocator-extended copy and move constructors
+    dyn_optional(std::allocator_arg_t, Allocator const& a, const dyn_optional& other);
+    dyn_optional(std::allocator_arg_t, Allocator const& a, dyn_optional&& other);
+
+    // Assignment operators
+    dyn_optional& operator=(const dyn_optional& other);
+    dyn_optional& operator=(dyn_optional&& other);
+```
+
+---
+
+No change to interface of observers.
+
+```cpp
+    // Observers
+    operator bool() const noexcept;
+
+    // Const accessors
+    T const* operator->() const;
+    T const& operator*() const;
+
+    // Non-const accessors
+    T* operator->();
+    T& operator*();
+
+    // Modifiers
+    void reset();
+    void swap(dyn_optional& other);
+
+    // Destructor
+    ~dyn_optional();
+};
+```
+
+---
+
+## `dyn_optional` with allocators II
+
+```cpp
+```
+
+---
+
+## `dyn_optional` with allocators III
+
+```cpp
+```
 
 ---
 
@@ -398,6 +523,7 @@ _container.requirements.general_ [Allocator-aware containers] N4687
 
 Containers use the `allocator_traits` template to get information about the allocator.
 
+---
 
 ## TODO(REMOVE): Why write an allocator?
 
