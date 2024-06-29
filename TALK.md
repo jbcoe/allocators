@@ -415,7 +415,7 @@ Containers use the `allocator_traits` template to get information about the allo
 * Relocatable data
 
 * Shared memory
-  
+
 <sub>Thanks to Bob Steagall (cppcon 2017) for collating the above list.</sub>
 
 ---
@@ -452,7 +452,7 @@ struct minimal_allocator {
     using value_type = T;
 
     minimal_allocator(PARAMS);
-    
+
     template<typename U> minimal_allocator(const minimal_allocator<U>&);
 
     T* allocate(std::size_t);
