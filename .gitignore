@@ -9,3 +9,4 @@ build*/
 out/
 .cache
 MODULE.bazel.lock
+TALK.pdf
