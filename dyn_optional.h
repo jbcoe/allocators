@@ -27,47 +27,49 @@ class dyn_optional {
   T* ptr;
 
  public:
-    // Constructors
-    dyn_optional() : ptr(nullptr) {}
-    
-    dyn_optional(const T& t) : ptr(new T(t)) {}
+  // Constructors
+  dyn_optional() : ptr(nullptr) {}
 
-    // Copy and Move Constructor
-    dyn_optional(const dyn_optional& other) : ptr(other.ptr ? new T(*other.ptr) : nullptr) {}
-    
-    dyn_optional(dyn_optional&& other) : ptr(other.ptr) { other.ptr = nullptr; }
+  dyn_optional(const T& t) : ptr(new T(t)) {}
 
-    // Copy and Move Assignment
-    dyn_optional& operator=(const dyn_optional& other) {
-        dyn_optional tmp(other);
-        tmp.swap(*this);
-        return *this;
-    }
+  // Copy and Move Constructor
+  dyn_optional(const dyn_optional& other)
+      : ptr(other.ptr ? new T(*other.ptr) : nullptr) {}
 
-    dyn_optional& operator=(dyn_optional&& other) {
-        other.swap(*this);
-        return *this;
-    }
+  dyn_optional(dyn_optional&& other) : ptr(other.ptr) { other.ptr = nullptr; }
 
-    // Observers
-    operator bool() const { return ptr != nullptr; }
+  // Copy and Move Assignment
+  dyn_optional& operator=(const dyn_optional& other) {
+    dyn_optional tmp(other);
+    tmp.swap(*this);
+    return *this;
+  }
 
-    // Const accessors
-    const T& operator*() const { return *ptr; }
-    const T* operator->() const { return ptr; }
+  dyn_optional& operator=(dyn_optional&& other) {
+    other.swap(*this);
+    return *this;
+  }
 
-    // Non-const accessors
-    T& operator*() { return *ptr; }
-    T* operator->() { return ptr; }
+  // Observers
+  operator bool() const { return ptr != nullptr; }
 
-    // Modifiers
-    void swap(dyn_optional& other) { std::swap(ptr, other.ptr); }
-    void reset() { delete ptr; ptr = nullptr; }
+  // Const accessors
+  const T& operator*() const { return *ptr; }
+  const T* operator->() const { return ptr; }
 
-    // Destructor
-    ~dyn_optional() { delete ptr; }
+  // Non-const accessors
+  T& operator*() { return *ptr; }
+  T* operator->() { return ptr; }
 
+  // Modifiers
+  void swap(dyn_optional& other) { std::swap(ptr, other.ptr); }
+  void reset() {
+    delete ptr;
+    ptr = nullptr;
+  }
 
+  // Destructor
+  ~dyn_optional() { delete ptr; }
 };
 
 }  // namespace xyz

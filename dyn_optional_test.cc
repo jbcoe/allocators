@@ -18,8 +18,9 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ==============================================================================*/
 
-#include "gtest/gtest.h"
 #include "dyn_optional.h"
+
+#include "gtest/gtest.h"
 
 namespace xyz {
 namespace test {
