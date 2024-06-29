@@ -456,7 +456,7 @@ Add allocator-extended constructors.
 
 ---
 
-No change to interface of observers.
+No change to remaining member function interfaces.
 
 ```cpp
     // Observers
@@ -481,14 +481,49 @@ No change to interface of observers.
 
 ---
 
-## `dyn_optional` with allocators II
+## `dyn_optional<T,A>` Constructors with allocators
 
 ```cpp
 ```
 
 ---
 
-## `dyn_optional` with allocators III
+## `dyn_optional<T,A>` Allocator-extended constructors
+
+```cpp
+```
+
+---
+
+## `dyn_optional<T,A>` Copy and move constructors
+
+```cpp
+```
+
+---
+
+## `dyn_optional<T,A>` Allocator-extended copy and move constructors
+
+```cpp
+```
+
+---
+
+## `dyn_optional<T,A>` Assignment operators
+
+```cpp
+```
+
+---
+
+## `dyn_optional<T,A>` Swap
+
+```cpp
+```
+
+---
+
+## `dyn_optional<T,A>` Destructor
 
 ```cpp
 ```
