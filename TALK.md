@@ -487,6 +487,8 @@ No change to remaining member function interfaces.
   using allocator_traits = std::allocator_traits<Allocator>;
   using pointer = typename allocator_traits::pointer;
 
+  // ...
+
   template <typename... Us>
   static pointer construct_from(A alloc, Us&&... us) {
     pointer mem = allocator_traits::allocate(alloc, 1);
@@ -498,6 +500,22 @@ No change to remaining member function interfaces.
       allocator_traits::deallocate(alloc, mem, 1);
       throw;
     }
+  }
+```
+
+---
+
+## `dyn_optional` Allocator-destruction helper
+
+```cpp
+  using allocator_traits = std::allocator_traits<Allocator>;
+  using pointer = typename allocator_traits::pointer;
+
+  // ...
+
+  constexpr static void destroy_with(A alloc, pointer p) {
+    allocator_traits::destroy(alloc, std::to_address(p));
+    allocator_traits::deallocate(alloc, p, 1);
   }
 ```
 
@@ -564,13 +582,15 @@ Use the allocator-construction helper in allocator-extended copy and move constr
 
 Thanks to:
 
-* Nina Ranns for fielding our regular questions on allocators.
+* My coauthor Ant Peacock.
 
-* Bob Steagall for his excellent cppcon 2017 talk on allocators.
+* Nina Ranns for fielding our regular questions on allocators.
 
 * Joshua Berne for pair-debugging our early implementation of `polymorphic`.
 
 * Neelofer Banglawala for her help with the slides.
+
+* Bob Steagall for his excellent cppcon 2017 talk on allocators.
 
 * Assorted members of the C++ community for their ongoing work on allocators.
 
