@@ -5,9 +5,7 @@ paginate: true
 size: 16:9
 ---
 
-# Allocators for C++ Vocabulary Types
-
-_Jonathan B. Coe & Antony Peacock_
+![bg contain](images/title-slide.png)
 
 ---
 
