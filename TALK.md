@@ -29,15 +29,14 @@ We've been working on adding `indirect` and `polymorphic` to the C++ standard.
 These two class templates are designed to be used for member data in composite
 types.
 
-An instance of `indirect<T>` owns an object of class `T`.
+* An instance of `indirect<T>` owns an object of class `T`.
 
-An instance of `polymorphic<T>` owns an object of class `T` or a class derived
-from `T`.
+* An instance of `polymorphic<T>` owns an object of class `T` or a class derived
+  from `T`.
 
 We've added allocator support to `indirect` and `polymorphic`.
 
-Work on `indirect` and `polymorphic` progresses at
-https://github.com/jbcoe/value_types
+Work progresses at https://github.com/jbcoe/value_types
 
 ---
 

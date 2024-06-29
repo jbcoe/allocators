@@ -5,3 +5,17 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "dyn_optional",
+    hdrs = ["dyn_optional.h"],
+)
+
+cc_test(
+    name = "dyn_optional_test",
+    srcs = ["dyn_optional_test.cc"],
+    deps = [
+        ":dyn_optional",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
