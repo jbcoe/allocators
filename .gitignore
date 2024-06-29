@@ -10,3 +10,4 @@ out/
 .cache
 MODULE.bazel.lock
 TALK.pdf
+value_types.cc

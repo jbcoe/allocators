@@ -481,7 +481,31 @@ No change to remaining member function interfaces.
 
 ---
 
+## `dyn_optional` Allocator-construction helper
+
+```cpp
+  using allocator_traits = std::allocator_traits<Allocator>;
+  using pointer = typename allocator_traits::pointer;
+
+  template <typename... Us>
+  static pointer construct_from(A alloc, Us&&... us) {
+    pointer mem = allocator_traits::allocate(alloc, 1);
+    try {
+      allocator_traits::construct(alloc, std::to_address(mem),
+                                  std::forward<Us>(us)...);
+      return mem;
+    } catch (...) {
+      allocator_traits::deallocate(alloc, mem, 1);
+      throw;
+    }
+  }
+```
+
+---
+
 ## `dyn_optional<T,A>` Constructors with allocators
+
+Use the allocator-construction helper in constructors
 
 ```cpp
 ```
@@ -490,6 +514,8 @@ No change to remaining member function interfaces.
 
 ## `dyn_optional<T,A>` Allocator-extended constructors
 
+Use the allocator-construction helper in allocator-extended constructors
+
 ```cpp
 ```
 
@@ -497,12 +523,16 @@ No change to remaining member function interfaces.
 
 ## `dyn_optional<T,A>` Copy and move constructors
 
+Use the allocator-construction helper in copy and move constructors
+
 ```cpp
 ```
 
 ---
 
 ## `dyn_optional<T,A>` Allocator-extended copy and move constructors
+
+Use the allocator-construction helper in allocator-extended copy and move constructors
 
 ```cpp
 ```
@@ -527,135 +557,6 @@ No change to remaining member function interfaces.
 
 ```cpp
 ```
-
----
-
-## TODO(REMOVE): C++03 allocators [Bob's slide]
-
-Pointers were always `T*`.
-
-Implementations assumed that allocators were stateless as instances always compared equal and could be considered interchangeable.
-
-Shared memory data structures could not be readily implemented with standard library containers.
-
-Scoped allocation was very difficult: `map<string, vector<string>>`
-
----
-
-## TODO(REMOVE): C++11 and beyond [Bob's slide]
-
-_nullablepointer.requirements_
-
-_allocator.requirements_
-
-_pointer.traits_
-
-_allocator.traits_
-
-_allocator.adaptor_
-
-_container.requirements.general_ [Allocator-aware containers] N4687
-
-Containers use the `allocator_traits` template to get information about the allocator.
-
----
-
-## TODO(REMOVE): Why write an allocator?
-
-* Performance
-  * Stack allocation
-  * Container-specific memory pools
-  * Thread-local allocation (lock-free)
-  * Memory pools
-  * Arena allocation
-
-* Debugging / Instrumentation / Testing
-
-* Relocatable data
-
-* Shared memory
-
-<sub>Thanks to Bob Steagall (cppcon 2017) for collating the above list.</sub>
-
----
-
-## TODO(REMOVE): Allocator propagation [Bob's slide]
-
-Lateral: Copy/move construction, copy/move assignment, swap.
-controlled by allocator propagation traits
-
-Deep: Nesting the allocator of the outermost container in a container heirarchy.
-scoped_allocator_adaptor helps with this
-
----
-
-## TODO(REMOVE): Allocator traits [Bob's slide]
-
-Gets information about an allocator and provides it to a container.
-
-Provides typedefs.
-
-Provides construct and destroy functions if not speficied by the allocator.
-
-Assumes propagation traits are false unless overridden.
-
-Assumes that allocators compare equal if empty.
-
----
-
-## TODO(REMOVE): Minimal allocator
-
-```cpp
-template <typename T>
-struct minimal_allocator {
-    using value_type = T;
-
-    minimal_allocator(PARAMS);
-
-    template<typename U> minimal_allocator(const minimal_allocator<U>&);
-
-    T* allocate(std::size_t);
-
-    void deallocate(T*, std::size_t);
-
-    friend bool operator==(const minimal_allocator&, const minimal_allocator&);
-};
-
-```
-
----
-
-## TODO(REMOVE): PMR allocators
-
-Runtime polymorphism using a `pmr::memory_resource` base class.
-
-PMR Allocators stick to the container, they do not propagate.
-
-`pmr::polymorphic_allocator` wraps a `pmr::memory_resource` and provides the allocator interface.
-
-The memory resource must outlive the allocators that use it.
-
----
-
-## TODO(REMOVE): swap
-
-Standard requires container iterators to be valid after a swap => UB in swap.
-
----
-
-## TODO(REMOVE): Scoped allocators
-
-Container passes its allocator to the constructor of the elements that it constructs.
-
-<sub>Thanks to Pablo Halpern and Alisdair Meredith for their excellent cppcon2019 talk</sub>
-
-Adding `using allocator_type = Allocator;` to a class makes it allocator-aware and allows it to support scoped allocators.
-
----
-
-## Allocators and C++ vocabulary types
-
-TODO
 
 ---
 
