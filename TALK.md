@@ -490,7 +490,7 @@ No change to remaining member function interfaces.
   // ...
 
   template <typename... Us>
-  static pointer construct_from(A alloc, Us&&... us) {
+  static pointer construct(A alloc, Us&&... us) {
     pointer mem = allocator_traits::allocate(alloc, 1);
     try {
       allocator_traits::construct(alloc, std::to_address(mem),
@@ -513,7 +513,7 @@ No change to remaining member function interfaces.
 
   // ...
 
-  constexpr static void destroy_with(A alloc, pointer p) {
+  constexpr static void destroy(A alloc, pointer p) {
     allocator_traits::destroy(alloc, std::to_address(p));
     allocator_traits::deallocate(alloc, p, 1);
   }
@@ -526,6 +526,12 @@ No change to remaining member function interfaces.
 Use the allocator-construction helper in constructors
 
 ```cpp
+dyn_optional() noexcept
+    : allocator(), ptr(construct(allocator)) {}
+
+template <typename ...Us>
+dyn_optional(Us&& ...us) noexcept
+    : allocator(), ptr(construct(allocator, std::forward<Us>(us)...)) {}
 ```
 
 ---
@@ -535,6 +541,12 @@ Use the allocator-construction helper in constructors
 Use the allocator-construction helper in allocator-extended constructors
 
 ```cpp
+dyn_optional(std::allocator_arg_t, const A& alloc) noexcept
+    : allocator(alloc), ptr(construct(allocator)) {}
+
+template <typename ...Us>
+dyn_optional(std::allocator_arg_t, const A& alloc, Us&& ...us) noexcept
+    : allocator(alloc), ptr(construct(allocator, std::forward<Us>(us)...)) {}
 ```
 
 ---
@@ -542,6 +554,8 @@ Use the allocator-construction helper in allocator-extended constructors
 ## `dyn_optional<T,A>` Copy and move constructors
 
 Use the allocator-construction helper in copy and move constructors
+
+Use `select_on_container_copy_construction` to copy (or not) the allocator.
 
 ```cpp
 ```
