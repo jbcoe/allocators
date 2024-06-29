@@ -592,17 +592,38 @@ Use the allocator-construction helper in allocator-extended copy and move constr
 
 ---
 
+## Slide-ware (do not use example code)
+
+We've omitted:
+
+* `requires`
+* `static_assert`
+* `noexcept`
+* `constexpr`
+* `// Any sort of helpful comments`
+* `[[nodiscard]]`
+
+Code from a reference implementation for our proposal
+
+"Vocabulary Types for Composite Class Design" https://wg21.link/P3019
+
+is more complete and includes these features.
+
+https://github.com/jbcoe/value_types
+
+---
+
 ## Acknowledgements
 
 Thanks to:
 
-* My coauthor Ant Peacock.
+* My co-author Antony Peacock.
 
 * Nina Ranns for fielding our regular questions on allocators.
 
 * Joshua Berne for pair-debugging our early implementation of `polymorphic`.
 
-* Neelofer Banglawala for her help with the slides.
+* Neelofer Banglawala for her help with the slides and papers.
 
 * Bob Steagall for his excellent cppcon 2017 talk on allocators.
 
