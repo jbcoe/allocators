@@ -598,7 +598,22 @@ dyn_optional(std::allocator_arg_t, const A& a, dyn_optional&& other)
 Use `propagate_on_container_copy_assignment` to determine what to do with allocators.
 
 ```cpp
-TODO
+dyn_optional& operator=(const dyn_optional& other) {
+    if(this!=&other) {
+        const bool POCCA = allocator_traits::propagate_on_container_copy_assignment::value;
+        if (!other) {
+            if(ptr) destroy(allocator, ptr);
+        } else {
+            pointer tmp = construct(POCCA ? other.allocator : allocator, *other.p_);
+            if (ptr) destroy(allocator, ptr);
+            ptr = tmp;
+        }
+        if (POCCA) {
+            allocator = other.allocator;
+        }
+    }
+    return *this;
+}
 ```
 
 ---
@@ -608,7 +623,27 @@ TODO
 Use `propagate_on_container_move_assignment` to determine what to do with allocators.
 
 ```cpp
-TODO
+dyn_optional& operator=(const dyn_optional& other) {
+    if(this!=&other) {
+        const bool POMCA = allocator_traits::propagate_on_container_move_assignment::value;
+        if (!other) {
+            if(ptr) destroy(allocator, ptr);
+        } else {
+            if(allocator == other.allocator) {
+                std::swap(ptr, other.ptr);
+                destroy(other.allocator, other.ptr);
+            }else{
+                pointer tmp = construct(POCMA ? other.allocator : allocator, std::move(*other.p_));
+                if (ptr) destroy(allocator, ptr);
+                ptr = tmp;
+            }
+        }
+        if (POCMA) {
+            allocator = other.allocator;
+        }
+    }
+    return *this;
+}
 ```
 
 ---
@@ -618,8 +653,24 @@ TODO
 Use `propagate_on_container_swap` to determine what to do with allocators.
 
 ```cpp
-TODO
+void swap(dyn_optional& other) {
+    if constexpr (allocator_traits::propagate_on_container_swap::value) {
+        std::swap(alloc_, other.alloc_);
+        std::swap(p_, other.p_);
+        return;
+    } else /* constexpr */ {
+        if (alloc_ == other.alloc_) {
+            std::swap(p_, other.p_);
+        } else {
+            std::unreachable();
+        }
+    }
+}
 ```
+
+For collections, swap cannot invalidate iterators, we apply the same principle to `dyn_optional`.
+
+If allocators are not propagated, and do not compare equal then behaviour is undefined.
 
 ---
 
