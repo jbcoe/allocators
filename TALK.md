@@ -30,10 +30,9 @@ We have been working on adding `indirect` and `polymorphic` to the C++ standard.
 These two class templates are designed to be used for member data in composite
 types.
 
-* An instance of `indirect<T>` owns an object of class `T`.
+- An instance of `indirect<T>` owns an object of class `T`.
 
-* An instance of `polymorphic<T>` owns an object of class `T` or a class derived
-  from `T`.
+- An instance of `polymorphic<T>` owns an object of class `T` or a class derived from `T`.
 
 We have added allocator support to `indirect` and `polymorphic`.
 
@@ -50,8 +49,7 @@ empty.
 
 When `dyn_optional` is non-empty, the value is stored in dynamic memory.
 
-There are not a host of good reasons to use `dyn_optional` but it should be
-simple enough for our examples.
+`dyn_optional` is not useful for real code but is sufficient for our examples.
 
 ---
 
@@ -110,14 +108,12 @@ class dyn_optional {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional()
-    : ptr(nullptr) {}
+dyn_optional<T>::dyn_optional() : ptr(nullptr) {}
 ```
 
 ```cpp
 template <typename T, typename ...Us>
-dyn_optional<T>::dyn_optional(Us&& ...us);
-    : ptr(new T(std::forward<Us>(us)...)) {}
+dyn_optional<T>::dyn_optional(Us&& ...us) : ptr(new T(std::forward<Us>(us)...)) {}
 ```
 
 ---
@@ -152,7 +148,7 @@ template <typename T>
 dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
     if(this!=&other) {
         delete ptr;
-        ptr = other.ptr ? new T(*other.ptr) : nullptr;
+        ptr = other.ptr? new T(*other.ptr) : nullptr;
     }
     return *this;
 }
@@ -281,7 +277,7 @@ The allocator is the box of Lego bricks that you use to build the model.
 
 ---
 
-## The Lego Analogy II: A common pile of bricks
+## A common pile of bricks
 
 With the default allocator, bricks come from a common pile (heap).
 
@@ -291,7 +287,7 @@ Bricks come out of the pile to build a model and go back into the pile when a mo
 
 ---
 
-## The Lego Analogy III: Sorted bricks
+## Sorted bricks
 
 With a custom allocator, bricks come from a specific box.
 
@@ -301,7 +297,7 @@ Red bricks come out of the red box and go back into the red box.
 
 ---
 
-## The Lego Analogy IV: Scoped allocators
+## Extending models
 
 When we add more complexity to the model, for instance another turret on our castle, we need more bricks.
 
@@ -313,7 +309,7 @@ With scoped allocators, a heirarchy of containers uses the same allocator as the
 
 ---
 
-## The Lego Analogy V: Allocator propagation
+## Copying models
 
 When we copy a model, we can use the same box of bricks or we can use a
 different box.
@@ -328,8 +324,7 @@ We must sure that when the models are taken apart, the bricks are returned to th
 
 ## A brief history of allocators
 
-Allocators were added to C++ as part of the STL to allow custom memory
-management.
+Allocators were added to C++ as part of the STL to allow custom memory management.
 
 ```cpp
 std::vector<T, A=std::allocator<T>>
@@ -346,12 +341,13 @@ contain state and were interacted with through allocator traits.
 
 ## Adding an allocator to dyn_optional
 
-We make an allocator part of `dyn_optional` and use the allocator to allocate and deallocate memory.
+We make an allocator part of `dyn_optional` and use the allocator to allocate
+and deallocate memory.
 
-A user could then specify the allocator they want to use when they create a `dyn_optional`.
+A user could then specify the allocator they want to use when they create a
+`dyn_optional`.
 
-We add the allocator as a second template parameter to `dyn_optional`. By default we use `std::allocator` so that if a
-user does not specify an allocator, we use the standard allocator just like other standard library types.
+We add the allocator as a second template parameter to `dyn_optional`.
 
 ```cpp
 template <typename T, typename Allocator = std::allocator<T>>
@@ -436,8 +432,7 @@ public:
     template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
 ```
 
-`[no_unique_address]` is a C++20 attribute that ensures that our object does not
-increase in size when the allocator is stateless.
+`[no_unique_address]` is a C++20 attribute that ensures that our object does not increase in size when the allocator is stateless.
 
 ---
 
@@ -640,26 +635,19 @@ TODO
 
 ---
 
-## Slide-ware (do not use example code)
+## Slide-ware: do not use our example code
 
 We have knowingly omitted:
 
-* `requires`
-* `static_assert`
-* `noexcept`
-* `constexpr`
-* `explicit`
-* `[[nodiscard]]`
-* Use of `pointer_traits` for fancy-pointer support
-* `// Any sort of helpful comments`
-
-Code from a reference implementation for our proposal
-
-"Vocabulary Types for Composite Class Design" https://wg21.link/P3019
-
-is more complete and includes these features.
-
-https://github.com/jbcoe/value_types
+- `assert`
+- `requires`
+- `static_assert`
+- `noexcept`
+- `constexpr`
+- `explicit`
+- `[[nodiscard]]`
+- Use of `pointer_traits` for fancy-pointer support
+- `// Any sort of helpful comments`
 
 ---
 
@@ -667,16 +655,18 @@ https://github.com/jbcoe/value_types
 
 Thanks to:
 
-* My co-author Antony Peacock.
+- My co-author Antony Peacock.
 
-* Nina Ranns for fielding our regular questions on allocators.
+- Nina Ranns for fielding our regular questions on allocators.
 
-* Joshua Berne for pair-debugging our early implementation of `polymorphic`.
+- Joshua Berne for pair-debugging our early implementation of `polymorphic`.
 
-* Neelofer Banglawala for her help with the slides and papers.
+- Neelofer Banglawala for her help with the slides and papers.
 
-* Bob Steagall for his excellent cppcon 2017 talk on allocators.
+- Bob Steagall for his excellent cppcon 2017 talk on allocators.
 
-* Assorted members of the C++ community for their ongoing work on allocators.
+- Assorted members of the C++ community for their ongoing work on allocators.
 
-We have been the grateful recipients of a great deal of wisdom. Mistakes are our own.
+We have been the grateful recipients of a great deal of wisdom.
+
+Mistakes are our own.
