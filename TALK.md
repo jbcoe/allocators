@@ -66,7 +66,7 @@ class dyn_optional {
   public:
     // Constructors
     dyn_optional() noexcept;
-    template <typename ...Us> dyn_optional(Us&& ...us);
+    template <typename ...Us> explict dyn_optional(Us&& ...us);
 
     // Copy and move constructors
     dyn_optional(const dyn_optional& other);
