@@ -150,9 +150,10 @@ dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) noexcept {
 ```cpp
 template <typename T>
 dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
-    if(this==&other) return *this;
-    delete ptr;
-    ptr = other.ptr ? new T(*other.ptr) : nullptr;
+    if(this!=&other) {
+        delete ptr;
+        ptr = other.ptr ? new T(*other.ptr) : nullptr;
+    }
     return *this;
 }
 ```
