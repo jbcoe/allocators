@@ -603,9 +603,10 @@ We have knowingly omitted:
 * `static_assert`
 * `noexcept`
 * `constexpr`
-* `// Any sort of helpful comments`
+* `explicit`
 * `[[nodiscard]]`
 * Use of `pointer_traits` for fancy-pointer support
+* `// Any sort of helpful comments`
 
 Code from a reference implementation for our proposal
 
