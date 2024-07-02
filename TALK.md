@@ -484,7 +484,7 @@ No change to remaining member function interfaces.
 
 ```cpp
   using allocator_traits = std::allocator_traits<Allocator>;
-  using pointer = typename allocator_traits::pointer;
+  using pointer = allocator_traits::pointer;
 
   // ...
 
@@ -492,8 +492,7 @@ No change to remaining member function interfaces.
   static pointer construct(A alloc, Us&&... us) {
     pointer mem = allocator_traits::allocate(alloc, 1);
     try {
-      allocator_traits::construct(alloc, std::to_address(mem),
-                                  std::forward<Us>(us)...);
+      allocator_traits::construct(alloc, std::to_address(mem), std::forward<Us>(us)...);
       return mem;
     } catch (...) {
       allocator_traits::deallocate(alloc, mem, 1);
@@ -508,7 +507,7 @@ No change to remaining member function interfaces.
 
 ```cpp
   using allocator_traits = std::allocator_traits<Allocator>;
-  using pointer = typename allocator_traits::pointer;
+  using pointer = allocator_traits::pointer;
 
   // ...
 
@@ -646,7 +645,7 @@ We have knowingly omitted:
 - `noexcept`
 - `constexpr`
 - `explicit`
-- `[[nodiscard]]`
+- `[[nodiscard]]` 🔥
 - `// Any sort of helpful comments`
 
 ---
