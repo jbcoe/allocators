@@ -65,7 +65,7 @@ class dyn_optional {
 
   public:
     // Constructors
-    dyn_optional() noexcept;
+    dyn_optional() ;
     template <typename ...Us> dyn_optional(Us&& ...us);
 
     // Copy and move constructors
@@ -85,7 +85,7 @@ class dyn_optional {
     ...
 
     // Observers
-    operator bool() const noexcept;
+    operator bool() const ;
 
     // Const accessors
     T const* operator->() const;
@@ -110,7 +110,7 @@ class dyn_optional {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional() noexcept
+dyn_optional<T>::dyn_optional()
     : ptr(nullptr) {}
 ```
 
@@ -126,7 +126,7 @@ dyn_optional<T>::dyn_optional(Us&& ...us);
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(const dyn_optional<T>& other) noexcept {
+dyn_optional<T>::dyn_optional(const dyn_optional<T>& other)  {
     if (other.ptr) {
         ptr = new T(*other.ptr);
     } else {
@@ -137,7 +137,7 @@ dyn_optional<T>::dyn_optional(const dyn_optional<T>& other) noexcept {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) noexcept {
+dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)  {
     ptr = other.ptr;
     other.ptr = nullptr;
 }
@@ -175,7 +175,7 @@ dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::operator bool() const noexcept {
+dyn_optional<T>::operator bool() const  {
     return ptr != nullptr;
 }
 ```
@@ -423,16 +423,16 @@ Add allocator-extended constructors.
 template <typename T, typename Allocator = std::allocator<T>>
 class dyn_optional {
 private:
-    T* ptr;
     [[no_unique_address]] Allocator allocator;
+    T* ptr;
 
 public:
     // Constructors
-    dyn_optional() noexcept;
+    dyn_optional() ;
     template <typename ...Us> dyn_optional(Us&& ...us);
 
     // Allocator-extended constructors
-    dyn_optional(std::allocator_arg_t, Allocator const& a) noexcept;
+    dyn_optional(std::allocator_arg_t, Allocator const& a) ;
     template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
 ```
 
@@ -463,7 +463,7 @@ No change to remaining member function interfaces.
 
 ```cpp
     // Observers
-    operator bool() const noexcept;
+    operator bool() const ;
 
     // Const accessors
     T const* operator->() const;
@@ -526,14 +526,14 @@ No change to remaining member function interfaces.
 
 ## `dyn_optional<T,A>` Constructors with allocators
 
-Use the allocator-construction helper in constructors
+Use the allocator-construction helper in constructors.
 
 ```cpp
-dyn_optional() noexcept
+dyn_optional()
     : allocator(), ptr(construct(allocator)) {}
 
 template <typename ...Us>
-dyn_optional(Us&& ...us) noexcept
+dyn_optional(Us&& ...us)
     : allocator(), ptr(construct(allocator, std::forward<Us>(us)...)) {}
 ```
 
@@ -541,49 +541,89 @@ dyn_optional(Us&& ...us) noexcept
 
 ## `dyn_optional<T,A>` Allocator-extended constructors
 
-Use the allocator-construction helper in allocator-extended constructors
+Use the allocator-construction helper in allocator-extended constructors.
 
 ```cpp
-dyn_optional(std::allocator_arg_t, const A& alloc) noexcept
-    : allocator(alloc), ptr(construct(allocator)) {}
+dyn_optional(std::allocator_arg_t, const A& a)
+    : allocator(a), ptr(construct(allocator)) {}
 
 template <typename ...Us>
-dyn_optional(std::allocator_arg_t, const A& alloc, Us&& ...us) noexcept
-    : allocator(alloc), ptr(construct(allocator, std::forward<Us>(us)...)) {}
+dyn_optional(std::allocator_arg_t, const A& a, Us&& ...us)
+    : allocator(a), ptr(construct(allocator, std::forward<Us>(us)...)) {}
 ```
 
 ---
 
 ## `dyn_optional<T,A>` Copy and move constructors
 
-Use the allocator-construction helper in copy and move constructors
+Use the allocator-construction helper in copy and move constructors.
 
 Use `select_on_container_copy_construction` to copy (or not) the allocator.
 
 ```cpp
+dyn_optional(const dyn_optional& other)  :
+    allocator(allocator_traits::select_on_container_copy_construction(other.allocator)),
+    ptr(other.ptr ? construct(allocator, *other), nullptr) {}
 ```
+
+```cpp
+dyn_optional(dyn_optional&& other)
+    : allocator(other.allocator) {
+    ptr = other.ptr;
+    other.ptr = nullptr;
+}
+```
+
+Note that for the move constructor, the allocator is always copied.
 
 ---
 
 ## `dyn_optional<T,A>` Allocator-extended copy and move constructors
 
-Use the allocator-construction helper in allocator-extended copy and move constructors
+Use the allocator-construction helper in allocator-extended copy and move constructors.
 
 ```cpp
+dyn_optional(std::allocator_arg_t, const A& a, const dyn_optional& other)  :
+    allocator(allocator_traits::select_on_container_copy_construction(a)),
+    ptr(other.ptr ? construct(allocator, *other), nullptr) {}
+```
+
+```cpp
+dyn_optional(std::allocator_arg_t, const A& a, dyn_optional&& other)
+    : allocator(a) {
+    ptr = other.ptr;
+    other.ptr = nullptr;
+}
 ```
 
 ---
 
-## `dyn_optional<T,A>` Assignment operators
+## `dyn_optional<T,A>` Copy assignment
+
+Use `propagate_on_container_copy_assignment` to determine what to do with allocators.
 
 ```cpp
+TODO
+```
+
+---
+
+## `dyn_optional<T,A>` Move assignment
+
+Use `propagate_on_container_move_assignment` to determine what to do with allocators.
+
+```cpp
+TODO
 ```
 
 ---
 
 ## `dyn_optional<T,A>` Swap
 
+Use `propagate_on_container_swap` to determine what to do with allocators.
+
 ```cpp
+TODO
 ```
 
 ---
@@ -591,6 +631,11 @@ Use the allocator-construction helper in allocator-extended copy and move constr
 ## `dyn_optional<T,A>` Destructor
 
 ```cpp
+~dyn_optional() {
+  if (ptr) {
+    destroy(allocator, ptr);
+  }
+}
 ```
 
 ---
