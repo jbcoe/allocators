@@ -160,10 +160,10 @@ dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
 ```cpp
 template <typename T>
 dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
-    if(this==&other) return *this;
-    delete ptr;
-    ptr = nullptr;
-    std::swap(ptr, other.ptr);
+    if(this!=&other) {
+        delete ptr;
+        ptr = std::exchange(other.ptr, nullptr);
+    }
     return *this;
 }
 ```
