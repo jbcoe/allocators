@@ -11,3 +11,4 @@ out/
 MODULE.bazel.lock
 TALK.pdf
 value_types.cc
+TALK.html

@@ -10,3 +10,4 @@
 cd $(dirname $(dirname "$0"))
 set -x
 marp TALK.md --allow-local-files --html -o TALK.pdf
+marp TALK.md --allow-local-files --html -o TALK.html
