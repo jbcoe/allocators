@@ -261,7 +261,17 @@ Allocators separate allocation and construction, and deallocation and destructio
 
 ## Why would we want to use an allocator?
 
-TODO
+Stack allocation (avoid the heap)
+
+Thread-local allocation (lock-free)
+
+Local memory pools (cache-friendly)
+
+Arena allocation (avoid fragmentation)
+
+Debugging, instrumentation and testing (e.g. leak detection)
+
+Relocatable data and shared memory (fancy pointers)
 
 ---
 
@@ -394,19 +404,42 @@ Note that this is not a convenience but a requirement for scoped allocator suppo
 
 ## Allocator-extended constructors
 
-TODO
+When a type provides allocator support with `using allocator_type = Allocator`
+it is expected to provide allocator-extended constructors.
+
+Allocator-extended constructors take either an allocator as the trailing argument:
+
+```cpp
+my_type(arg0, arg1, arg2, allocator);
+```
+
+or `std::allocator_arg_t` followed by an allocator as the leading arguments:
+
+```cpp
+my_type(std::allocator_arg_t, allocator, args...);
+```
 
 ---
 
 ## Allocator propagation
 
-TODO
+When we copy or assign an instance of our allocator-aware type, what happens to the allocator?
 
----
+Allocator propagation is controlled by allocator traits:
 
-## `swap` in the presence of allocators
+```cpp
+allocator_traits::select_on_container_copy_construction(const Allocator&);
+```
 
-TODO
+This function (usually) returns a copy of an allocator or a default-constructed allocator.
+
+```cpp
+allocator_traits::propagate_on_container_copy_assignment::value
+allocator_traits::propagate_on_container_move_assignment::value
+allocator_traits::propagate_on_container_swap::value
+```
+
+These traits are used to determine what to do with the allocator when copying, moving or swapping.
 
 ---
 
