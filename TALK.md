@@ -25,7 +25,7 @@ size: 16:9
 
 ## Adding `indirect` and `polymorphic` to the C++ standard
 
-We've been working on adding `indirect` and `polymorphic` to the C++ standard.
+We have been working on adding `indirect` and `polymorphic` to the C++ standard.
 
 These two class templates are designed to be used for member data in composite
 types.
@@ -35,7 +35,7 @@ types.
 * An instance of `polymorphic<T>` owns an object of class `T` or a class derived
   from `T`.
 
-We've added allocator support to `indirect` and `polymorphic`.
+We have added allocator support to `indirect` and `polymorphic`.
 
 Work progresses at https://github.com/jbcoe/value_types.
 
@@ -43,7 +43,7 @@ Work progresses at https://github.com/jbcoe/value_types.
 
 ## A simple new type: `dyn_optional`
 
-We'll work on a new type, `dyn_optional`, for our examples.
+We will work on a new type, `dyn_optional`, for our examples.
 
 `dyn_optional`, like `std::optional`, is a type that can hold a value or be
 empty.
@@ -241,7 +241,7 @@ dyn_optional<T>::~dyn_optional() {
 
 ## Allocating memory
 
-We've used `new` to allocate memory for the value in `dyn_optional` and `delete` to deallocate it.
+We used `new` to allocate memory for the value in `dyn_optional` and `delete` to deallocate it.
 
 We want to use allocators to allocate and deallocate memory as they offer more control and flexibility.
 
@@ -274,7 +274,7 @@ TODO
 
 While working on `indirect` and `polymorphic`, we came up with an analogy that made us re-think our code.
 
-Imagine that you're building a Lego model.
+Imagine that we are building a Lego model.
 
 The allocator is the box of Lego bricks that you use to build the model.
 
@@ -317,7 +317,7 @@ With scoped allocators, a heirarchy of containers uses the same allocator as the
 When we copy a model, we can use the same box of bricks or we can use a
 different box.
 
-Perhaps you're copying your friend's red house and need to use your supply of red bricks.
+Perhaps you are copying your friend's red house and need to use your supply of red bricks.
 
 We must sure that when the models are taken apart, the bricks are returned to the correct box.
 
@@ -350,7 +350,7 @@ We make an allocator part of `dyn_optional` and use the allocator to allocate an
 A user could then specify the allocator they want to use when they create a `dyn_optional`.
 
 We add the allocator as a second template parameter to `dyn_optional`. By default we use `std::allocator` so that if a
-user doesn't specify an allocator, we use the standard allocator just like other standard library types.
+user does not specify an allocator, we use the standard allocator just like other standard library types.
 
 ```cpp
 template <typename T, typename Allocator = std::allocator<T>>
@@ -361,7 +361,7 @@ class dyn_optional;
 
 ## Allocator traits
 
-We'll interact with an allocator using allocator traits.
+Our class will interact with an allocator using allocator traits.
 
 ```cpp
 Allocator allocator; // An instance of the allocator
@@ -596,7 +596,7 @@ Use the allocator-construction helper in allocator-extended copy and move constr
 
 ## Slide-ware (do not use example code)
 
-We've omitted:
+We have knowingly omitted:
 
 * `requires`
 * `static_assert`
@@ -604,6 +604,7 @@ We've omitted:
 * `constexpr`
 * `// Any sort of helpful comments`
 * `[[nodiscard]]`
+* Use of `pointer_traits` for fancy-pointer support
 
 Code from a reference implementation for our proposal
 
@@ -631,4 +632,4 @@ Thanks to:
 
 * Assorted members of the C++ community for their ongoing work on allocators.
 
-We've been the grateful recipients of a great deal of wisdom. Mistakes are our own.
+We have been the grateful recipients of a great deal of wisdom. Mistakes are our own.
