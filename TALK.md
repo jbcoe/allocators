@@ -433,7 +433,7 @@ public:
     template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
 ```
 
-`[no_unique_address]` is a C++20 attribute that ensures that our object does not increase in size when the allocator is stateless.
+`no_unique_address` is a C++20 attribute that ensures that our object does not increase in size when the allocator is stateless.
 
 ---
 
