@@ -10,11 +10,13 @@ size: 16:9
 
 ---
 
+<!-- paginate: true -->
+
 ## Outline
 
 1. Adding new types to the C++ standard.
 1. A simple new type: `dyn_optional`.
-1. Implementing `dyn_optional`
+1. Implementing `dyn_optional`.
 1. Introducing allocators.
 1. A Lego analogy for allocators.
 1. Adding allocator support to `dyn_optional`.
@@ -35,7 +37,7 @@ types.
 
 We've added allocator support to `indirect` and `polymorphic`.
 
-Work progresses at https://github.com/jbcoe/value_types
+Work progresses at https://github.com/jbcoe/value_types.
 
 ---
 
