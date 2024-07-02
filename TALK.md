@@ -32,7 +32,8 @@ types.
 
 - An instance of `indirect<T>` owns an object of class `T`.
 
-- An instance of `polymorphic<T>` owns an object of class `T` or a class derived from `T`.
+- An instance of `polymorphic<T>` owns an object of class `T`
+  or an object of a class derived from `T`.
 
 We have added allocator support to `indirect` and `polymorphic`.
 
@@ -44,12 +45,11 @@ Work progresses at https://github.com/jbcoe/value_types.
 
 We will work on a new type, `dyn_optional`, for our examples.
 
-`dyn_optional`, like `std::optional`, is a type that can hold a value or be
-empty.
+`dyn_optional`, like `std::optional`, can hold a value or be empty.
 
 When `dyn_optional` is non-empty, the value is stored in dynamic memory.
 
-`dyn_optional` is not useful for real code but is sufficient for our examples.
+`dyn_optional` is not likely to be useful for real code.
 
 ---
 
@@ -363,13 +363,14 @@ Our class will interact with an allocator using allocator traits.
 ```cpp
 Allocator allocator; // An instance of the allocator
 using allocator_traits = std::allocator_traits<Allocator>;
+using pointer = typename allocator_traits::pointer;
 
 // Allocate memory and construct an object.
-auto memory = allocator_traits::allocate(allocator, 1);
-allocator_traits::construct(allocator, memory, std::forward<Us>(us)...);
+pointer memory = allocator_traits::allocate(allocator, 1);
+allocator_traits::construct(allocator, std::to_address(memory), std::forward<Us>(us)...);
 
 // Destroy an object and deallocate memory.
-allocator_traits::destroy(allocator, memory);
+allocator_traits::destroy(allocator, std::to_address(memory));
 allocator_traits::deallocate(allocator, memory, 1);
 ```
 
@@ -511,7 +512,7 @@ No change to remaining member function interfaces.
 
   // ...
 
-  constexpr static void destroy(A alloc, pointer p) {
+  static void destroy(A alloc, pointer p) {
     allocator_traits::destroy(alloc, std::to_address(p));
     allocator_traits::deallocate(alloc, p, 1);
   }
@@ -646,7 +647,6 @@ We have knowingly omitted:
 - `constexpr`
 - `explicit`
 - `[[nodiscard]]`
-- Use of `pointer_traits` for fancy-pointer support
 - `// Any sort of helpful comments`
 
 ---
