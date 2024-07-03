@@ -133,7 +133,7 @@ dyn_optional<T>::dyn_optional(const dyn_optional<T>& other)  {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(dyn_optional<T>&& other) 
+dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)
     : ptr(std::exchange(other.ptr, nullptr)) {}
 ```
 
@@ -593,7 +593,7 @@ dyn_optional(const dyn_optional& other)  :
 ```
 
 ```cpp
-dyn_optional(dyn_optional&& other) : 
+dyn_optional(dyn_optional&& other) :
     allocator(other.allocator)
     ptr(std::exchange(other.ptr, nullptr)) {}
 ```
