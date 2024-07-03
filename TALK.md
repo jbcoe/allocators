@@ -587,7 +587,7 @@ Use the allocator-construction helper in copy and move constructors.
 Use `select_on_container_copy_construction` to copy (or not) the allocator.
 
 ```cpp
-dyn_optional(const dyn_optional& other)  :
+dyn_optional(const dyn_optional& other) :
     allocator(allocator_traits::select_on_container_copy_construction(other.allocator)),
     ptr(other.ptr ? construct(allocator, *other), nullptr) {}
 ```
