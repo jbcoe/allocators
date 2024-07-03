@@ -133,10 +133,8 @@ dyn_optional<T>::dyn_optional(const dyn_optional<T>& other)  {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)  {
-    ptr = other.ptr;
-    other.ptr = nullptr;
-}
+dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)
+    : ptr(std::exchange(other.ptr, nullptr)) {}
 ```
 
 ---
@@ -595,11 +593,9 @@ dyn_optional(const dyn_optional& other)  :
 ```
 
 ```cpp
-dyn_optional(dyn_optional&& other)
-    : allocator(other.allocator) {
-    ptr = other.ptr;
-    other.ptr = nullptr;
-}
+dyn_optional(dyn_optional&& other) :
+    allocator(other.allocator)
+    ptr(std::exchange(other.ptr, nullptr)) {}
 ```
 
 Note that for the move constructor, the allocator is always copied.
@@ -617,11 +613,9 @@ dyn_optional(std::allocator_arg_t, const A& a, const dyn_optional& other)  :
 ```
 
 ```cpp
-dyn_optional(std::allocator_arg_t, const A& a, dyn_optional&& other)
-    : allocator(a) {
-    ptr = other.ptr;
-    other.ptr = nullptr;
-}
+dyn_optional(std::allocator_arg_t, const A& a, dyn_optional&& other) :
+    allocator(other.allocator)
+    ptr(std::exchange(other.ptr, nullptr)) {}
 ```
 
 ---
@@ -663,7 +657,8 @@ dyn_optional& operator=(const dyn_optional& other) {
             if(ptr) destroy(allocator, ptr);
         } else {
             if(allocator == other.allocator) {
-                std::swap(ptr, other.ptr);
+                using namespace std;
+                swap(ptr, other.ptr);
                 destroy(other.allocator, other.ptr);
             }else{
                 pointer tmp = construct(POCMA ? other.allocator : allocator, std::move(*other.p_));
@@ -687,13 +682,14 @@ Use `propagate_on_container_swap` to determine what to do with allocators.
 
 ```cpp
 void swap(dyn_optional& other) {
+    using namespace std;
     if constexpr (allocator_traits::propagate_on_container_swap::value) {
-        std::swap(alloc_, other.alloc_);
-        std::swap(p_, other.p_);
+        swap(alloc_, other.alloc_);
+        swap(p_, other.p_);
         return;
     } else /* constexpr */ {
         if (alloc_ == other.alloc_) {
-            std::swap(p_, other.p_);
+            swap(p_, other.p_);
         } else {
             std::unreachable();
         }
