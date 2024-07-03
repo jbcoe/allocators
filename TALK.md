@@ -63,7 +63,7 @@ class dyn_optional {
 
   public:
     // Constructors
-    dyn_optional() ;
+    dyn_optional();
     template <typename ...Us> dyn_optional(Us&& ...us);
 
     // Copy and move constructors
@@ -83,7 +83,7 @@ class dyn_optional {
     ...
 
     // Observers
-    operator bool() const ;
+    operator bool() const;
 
     // Const accessors
     T const* operator->() const;
@@ -456,11 +456,11 @@ private:
 
 public:
     // Constructors
-    dyn_optional() ;
+    dyn_optional();
     template <typename ...Us> dyn_optional(Us&& ...us);
 
     // Allocator-extended constructors
-    dyn_optional(std::allocator_arg_t, Allocator const& a) ;
+    dyn_optional(std::allocator_arg_t, Allocator const& a);
     template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
 ```
 
@@ -490,7 +490,7 @@ No change to remaining member function interfaces.
 
 ```cpp
     // Observers
-    operator bool() const ;
+    operator bool() const;
 
     // Const accessors
     T const* operator->() const;
