@@ -37,7 +37,8 @@ types.
   or an object of a class derived from `T`.
 
 We needed to add allocator support to `indirect` and `polymorphic`.
-This talk covers the basics what we learnt along the way.
+
+This talk is our opportunity to share what we learned.
 
 Work progresses at https://github.com/jbcoe/value_types.
 
