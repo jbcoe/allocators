@@ -25,7 +25,7 @@ size: 16:9
 
 ## Adding new types to the C++ standard
 
-We have been working on adding new value types `indirect` and `polymorphic` to 
+We have been working on adding new value types `indirect` and `polymorphic` to
 the C++ standard.
 
 These two class templates are designed to be used for member data in composite
@@ -248,7 +248,7 @@ or object creation and destruction?
 ## Allocators
 
 _The basic purpose of an allocator is to provide a source of memory for a given
-type, and a place to return that memory to once it is no longer needed._ 
+type, and a place to return that memory to once it is no longer needed._
 – <small>Bjarne Stroustrup, The C++ Programming Language, 4th Edition</small>
 
 Allocators provide a more granular way to manage memory than `new` and `delete`.
@@ -277,7 +277,7 @@ Relocatable data and shared memory (fancy pointers)
 
 ![bg right](images/Ant1.jpeg)
 
-While working on `indirect` and `polymorphic`, we came up with an analogy that made us 
+While working on `indirect` and `polymorphic`, we came up with an analogy that made us
 re-think our code.
 
 Imagine that we are building a Lego model.
@@ -290,7 +290,7 @@ The allocator is the box of Lego bricks that you use to build the model.
 
 With the default allocator, bricks come from a common pile (heap).
 
-Bricks come out of the pile to build a model and go back into the pile when a model is 
+Bricks come out of the pile to build a model and go back into the pile when a model is
 taken apart.
 
 ![bg left](images/multi-lego.jpeg)
@@ -309,12 +309,12 @@ Red bricks come out of the red box and go back into the red box.
 
 ## Extending models
 
-When we add more complexity to the model, for instance another turret on our castle, we need 
+When we add more complexity to the model, for instance another turret on our castle, we need
 more bricks.
 
 We can use a different box for the new bricks or we can use the same box as the original model.
 
-With scoped allocators, a heirarchy of containers uses the same allocator as the outermost 
+With scoped allocators, a heirarchy of containers uses the same allocator as the outermost
 container.
 
 ![bg left](images/lego-castle.png)
@@ -392,10 +392,10 @@ See https://en.cppreference.com/w/cpp/memory/allocator_traits for more informati
 
 ## Making `dyn_optional` allocator-aware
 
-For scoped allocator support, a container needs to know if the objects it constructs need 
+For scoped allocator support, a container needs to know if the objects it constructs need
 to be constructed with an allocator.
 
-Types can advertise their allocator support by adding the `using` declaration to their 
+Types can advertise their allocator support by adding the `using` declaration to their
 class definition:
 
 ```cpp
@@ -427,7 +427,7 @@ my_type(std::allocator_arg_t, allocator, args...);
 
 ## Allocator propagation
 
-When we copy or assign an instance of our allocator-aware type, what happens to 
+When we copy or assign an instance of our allocator-aware type, what happens to
 the allocator?
 
 Allocator propagation is controlled by allocator traits:
@@ -436,7 +436,7 @@ Allocator propagation is controlled by allocator traits:
 allocator_traits::select_on_container_copy_construction(const Allocator&);
 ```
 
-This function (usually) returns a copy of an allocator or a default-constructed 
+This function (usually) returns a copy of an allocator or a default-constructed
 allocator.
 
 ```cpp
@@ -445,7 +445,7 @@ allocator_traits::propagate_on_container_move_assignment::value
 allocator_traits::propagate_on_container_swap::value
 ```
 
-These traits are used to determine what to do with the allocator when copying, 
+These traits are used to determine what to do with the allocator when copying,
 moving or swapping.
 
 ---
@@ -473,7 +473,7 @@ public:
     template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
 ```
 
-`no_unique_address` is a C++20 attribute that ensures our object does not increase in size when the 
+`no_unique_address` is a C++20 attribute that ensures our object does not increase in size when the
 allocator is stateless.
 
 ---
