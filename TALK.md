@@ -97,7 +97,6 @@ class dyn_optional {
     T& operator*();
 
     // Modifiers
-    void reset();
     void swap(dyn_optional& other);
 
     // Destructor
@@ -512,7 +511,6 @@ No change to remaining member function interfaces.
     T& operator*();
 
     // Modifiers
-    void reset();
     void swap(dyn_optional& other);
 
     // Destructor
