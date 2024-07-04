@@ -147,7 +147,7 @@ dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)
 ```cpp
 template <typename T>
 dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
-    if(this!=&other) {
+    if (this!=&other) {
         delete ptr;
         ptr = other.ptr? new T(*other.ptr) : nullptr;
     }
@@ -158,7 +158,7 @@ dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
 ```cpp
 template <typename T>
 dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
-    if(this!=&other) {
+    if (this!=&other) {
         delete ptr;
         ptr = std::exchange(other.ptr, nullptr);
     }
@@ -637,10 +637,10 @@ Use `propagate_on_container_copy_assignment` to determine what to do with alloca
 
 ```cpp
 dyn_optional& operator=(const dyn_optional& other) {
-    if(this!=&other) {
+    if (this!=&other) {
         const bool POCCA = allocator_traits::propagate_on_container_copy_assignment::value;
         if (!other) {
-            if(ptr) destroy(allocator, ptr);
+            if (ptr) destroy(allocator, ptr);
         } else {
             pointer tmp = construct(POCCA ? other.allocator : allocator, *other.p_);
             if (ptr) destroy(allocator, ptr);
@@ -662,12 +662,12 @@ Use `propagate_on_container_move_assignment` to determine what to do with alloca
 
 ```cpp
 dyn_optional& operator=(const dyn_optional& other) {
-    if(this!=&other) {
+    if (this!=&other) {
         const bool POMCA = allocator_traits::propagate_on_container_move_assignment::value;
         if (!other) {
-            if(ptr) destroy(allocator, ptr);
+            if (ptr) destroy(allocator, ptr);
         } else {
-            if(allocator == other.allocator) {
+            if (allocator == other.allocator) {
                 using namespace std;
                 swap(ptr, other.ptr);
                 destroy(other.allocator, other.ptr);
