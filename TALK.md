@@ -89,8 +89,8 @@ class dyn_optional {
     operator bool() const;
 
     // Const accessors
-    T const* operator->() const;
-    T const& operator*() const;
+    const T* operator->() const;
+    const T& operator*() const;
 
     // Non-const accessors
     T* operator->();
@@ -183,14 +183,14 @@ dyn_optional<T>::operator bool() const  {
 
 ```cpp
 template <typename T>
-T const* dyn_optional<T>::operator->() const {
+const T* dyn_optional<T>::operator->() const {
     return ptr;
 }
 ```
 
 ```cpp
 template <typename T>
-T const& dyn_optional<T>::operator*() const {
+const T& dyn_optional<T>::operator*() const {
     return *ptr;
 }
 ```
@@ -504,8 +504,8 @@ No change to remaining member function interfaces.
     operator bool() const;
 
     // Const accessors
-    T const* operator->() const;
-    T const& operator*() const;
+    const T* operator->() const;
+    const T& operator*() const;
 
     // Non-const accessors
     T* operator->();
