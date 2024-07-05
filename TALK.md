@@ -302,7 +302,7 @@ Relocatable data and shared memory (fancy pointers)
 
 ## The Lego Analogy
 
-![bg right](images/Ant1.jpeg)
+![bg right](images/hawaii.jpeg)
 
 While working on `indirect` and `polymorphic`, we came up with an analogy that made us
 re-think our code.
