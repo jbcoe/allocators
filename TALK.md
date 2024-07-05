@@ -25,11 +25,9 @@ size: 16:9
 
 ## Adding new types to the C++ standard
 
-We have been working on adding new value types `indirect` and `polymorphic` to
-the C++ standard.
+We have been working on adding new value types `indirect` and `polymorphic` to the C++ standard.
 
-These two class templates are designed to be used for member data in composite
-types.
+These two class templates are designed to be used for member data in composite types.
 
 - An instance of `indirect<T>` owns an object of class `T`.
 
@@ -257,8 +255,8 @@ What if we need finer control over memory allocation and deallocation
 
 ## Allocators
 
-_The basic purpose of an allocator is to provide a source of memory for a given
-type, and a place to return that memory to once it is no longer needed._
+_The basic purpose of an allocator is to provide a source of memory for a given type, and a place to return that memory to once it is no longer needed._
+
 – <small>Bjarne Stroustrup, The C++ Programming Language, 4th Edition</small>
 
 Allocators provide a more granular way to manage memory than `new` and `delete`.
@@ -275,12 +273,9 @@ Allocators were added to C++ as part of the STL to allow custom memory managemen
 std::vector<T, A=std::allocator<T>>
 ```
 
-Before C++11, an allocator was a lightweight handle with a set of member functions
-that affected how an object was constructed and destroyed, and how memory was
-allocated and deallocated from some global resource.
+Before C++11, an allocator was a lightweight handle with a set of member functions that affected how an object was constructed and destroyed, and how memory was allocated and deallocated from some global resource.
 
-C++11 introduced a more sophisticated model of allocators where allocators could
-contain state and were interacted with through allocator traits.
+C++11 introduced a more sophisticated model of allocators where allocators could contain state and were interacted with through allocator traits.
 
 ---
 
@@ -304,8 +299,7 @@ Relocatable data and shared memory (fancy pointers)
 
 ![bg right](images/hawaii.jpeg)
 
-While working on `indirect` and `polymorphic`, we came up with an analogy that made us
-re-think our code.
+While working on `indirect` and `polymorphic`, we came up with an analogy that made us re-think our code.
 
 Imagine that we are building a Lego model.
 
@@ -317,8 +311,7 @@ The allocator is the box of Lego bricks that you use to build the model.
 
 With the default allocator, bricks come from a common pile (heap).
 
-Bricks come out of the pile to build a model and go back into the pile when a model is
-taken apart.
+Bricks come out of the pile to build a model and go back into the pile when a model is taken apart.
 
 ![bg left](images/multi-lego.jpeg)
 
@@ -336,13 +329,11 @@ Red bricks come out of the red box and go back into the red box.
 
 ## Extending models
 
-When we add more complexity to the model, for instance another turret on our castle, we need
-more bricks.
+When we add more complexity to the model, for instance another turret on our castle, we need more bricks.
 
 We can use a different box for the new bricks or we can use the same box as the original model.
 
-With scoped allocators, a heirarchy of containers uses the same allocator as the outermost
-container.
+With scoped allocators, a heirarchy of containers uses the same allocator as the outermost container.
 
 ![bg left](images/lego-castle.png)
 
@@ -363,11 +354,9 @@ We must sure that when the models are taken apart, the bricks are returned to th
 
 ## Adding an allocator to dyn_optional
 
-We make an allocator part of `dyn_optional` and use the allocator to allocate
-and deallocate memory.
+We make an allocator part of `dyn_optional` and use the allocator to allocate and deallocate memory.
 
-A user could then specify the allocator they want to use when they create a
-`dyn_optional`.
+A user could then specify the allocator they want to use when they create a `dyn_optional`.
 
 We add the allocator as a second template parameter to `dyn_optional`.
 
@@ -385,7 +374,7 @@ Our class will interact with an allocator using allocator traits.
 ```cpp
 Allocator allocator; // An instance of the allocator
 using allocator_traits = std::allocator_traits<Allocator>;
-using pointer = typename allocator_traits::pointer;
+using pointer = allocator_traits::pointer;
 
 // Allocate memory and construct an object.
 pointer memory = allocator_traits::allocate(allocator, 1);
@@ -402,11 +391,9 @@ See https://en.cppreference.com/w/cpp/memory/allocator_traits for more informati
 
 ## Making `dyn_optional` allocator-aware
 
-For scoped allocator support, a container needs to know if the objects it constructs need
-to be constructed with an allocator.
+For scoped allocator support, a container needs to know if the objects it constructs need to be constructed with an allocator.
 
-Types can advertise their allocator support by adding the `using` declaration to their
-class definition:
+Types can advertise their allocator support by adding the `using` declaration to their class definition:
 
 ```cpp
 using allocator_type = Allocator;
@@ -418,8 +405,7 @@ Note: this is not a convenience but a requirement for scoped allocator support.
 
 ## Allocator-extended constructors
 
-When a type provides allocator support with `using allocator_type = Allocator`,
-it is expected to provide allocator-extended constructors.
+When a type provides allocator support with `using allocator_type = Allocator`, it is expected to provide allocator-extended constructors.
 
 Allocator-extended constructors take either an allocator as the trailing argument:
 
@@ -446,8 +432,7 @@ Allocator propagation is controlled by allocator traits:
 allocator_traits::select_on_container_copy_construction(const Allocator&);
 ```
 
-This function (usually) returns a copy of an allocator or a default-constructed
-allocator.
+This function (usually) returns a copy of an allocator or a default-constructed allocator.
 
 ```cpp
 allocator_traits::propagate_on_container_copy_assignment::value
@@ -455,8 +440,7 @@ allocator_traits::propagate_on_container_move_assignment::value
 allocator_traits::propagate_on_container_swap::value
 ```
 
-These traits are used to determine what to do with the allocator when copying,
-moving or swapping.
+These traits are used to determine what to do with the allocator when copying, moving or swapping.
 
 ---
 
@@ -483,8 +467,7 @@ public:
     template <typename ...Us> dyn_optional(std::allocator_arg_t, Allocator const& a, Us&& ...us);
 ```
 
-`no_unique_address` is a C++20 attribute that ensures our object does not increase in size when the
-allocator is stateless.
+`no_unique_address` is a C++20 attribute that ensures our object does not increase in size when the allocator is stateless.
 
 ---
 
@@ -575,7 +558,7 @@ Use the allocator-construction helper in constructors.
 
 ```cpp
 dyn_optional()
-    : allocator(), ptr(construct(allocator)) {}
+    : allocator(), ptr(nullptr) {}
 
 template <typename ...Us>
 dyn_optional(Us&& ...us)
@@ -590,7 +573,7 @@ Use the allocator-construction helper in allocator-extended constructors.
 
 ```cpp
 dyn_optional(std::allocator_arg_t, const A& a)
-    : allocator(a), ptr(construct(allocator)) {}
+    : allocator(a), ptr(nullptr) {}
 
 template <typename ...Us>
 dyn_optional(std::allocator_arg_t, const A& a, Us&& ...us)
@@ -669,7 +652,7 @@ dyn_optional& operator=(const dyn_optional& other) {
 Use `propagate_on_container_move_assignment` to determine what to do with allocators.
 
 ```cpp
-dyn_optional& operator=(const dyn_optional& other) {
+dyn_optional& operator=(dyn_optional&& other) {
     if (this!=&other) {
         const bool POMCA = allocator_traits::propagate_on_container_move_assignment::value;
         if (!other) {
