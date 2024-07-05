@@ -110,12 +110,12 @@ class dyn_optional {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional() : ptr(nullptr) {}
+dyn_optional() : ptr(nullptr) {}
 ```
 
 ```cpp
 template <typename T, typename ...Us>
-dyn_optional<T>::dyn_optional(Us&& ...us) : ptr(new T(std::forward<Us>(us)...)) {}
+dyn_optional(Us&& ...us) : ptr(new T(std::forward<Us>(us)...)) {}
 ```
 
 ---
@@ -124,7 +124,7 @@ dyn_optional<T>::dyn_optional(Us&& ...us) : ptr(new T(std::forward<Us>(us)...)) 
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(const dyn_optional<T>& other)  {
+dyn_optional(const dyn_optional<T>& other)  {
     if (other.ptr) {
         ptr = new T(*other.ptr);
     } else {
@@ -135,7 +135,7 @@ dyn_optional<T>::dyn_optional(const dyn_optional<T>& other)  {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)
+dyn_optional(dyn_optional<T>&& other)
     : ptr(std::exchange(other.ptr, nullptr)) {}
 ```
 
@@ -145,7 +145,7 @@ dyn_optional<T>::dyn_optional(dyn_optional<T>&& other)
 
 ```cpp
 template <typename T>
-dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
+dyn_optional<T>& operator=(const dyn_optional<T>& other) {
     if (this!=&other) {
         delete ptr;
         ptr = other.ptr? new T(*other.ptr) : nullptr;
@@ -156,7 +156,7 @@ dyn_optional<T>& dyn_optional<T>::operator=(const dyn_optional<T>& other) {
 
 ```cpp
 template <typename T>
-dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
+dyn_optional<T>& operator=(dyn_optional<T>&& other) {
     if (this!=&other) {
         delete ptr;
         ptr = std::exchange(other.ptr, nullptr);
@@ -171,7 +171,7 @@ dyn_optional<T>& dyn_optional<T>::operator=(dyn_optional<T>&& other) {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::operator bool() const  {
+operator bool() const  {
     return ptr != nullptr;
 }
 ```
@@ -182,14 +182,14 @@ dyn_optional<T>::operator bool() const  {
 
 ```cpp
 template <typename T>
-const T* dyn_optional<T>::operator->() const {
+const T* operator->() const {
     return ptr;
 }
 ```
 
 ```cpp
 template <typename T>
-const T& dyn_optional<T>::operator*() const {
+const T& operator*() const {
     return *ptr;
 }
 ```
@@ -200,14 +200,14 @@ const T& dyn_optional<T>::operator*() const {
 
 ```cpp
 template <typename T>
-T* dyn_optional<T>::operator->() {
+T* operator->() {
     return ptr;
 }
 ```
 
 ```cpp
 template <typename T>
-T& dyn_optional<T>::operator*() {
+T& operator*() {
     return *ptr;
 }
 ```
@@ -218,7 +218,7 @@ T& dyn_optional<T>::operator*() {
 
 ```cpp
 template <typename T>
-void dyn_optional<T>::swap(dyn_optional<T>& other) {
+void swap(dyn_optional<T>& other) {
     std::swap(ptr, other.ptr);
 }
 ```
@@ -229,7 +229,7 @@ void dyn_optional<T>::swap(dyn_optional<T>& other) {
 
 ```cpp
 template <typename T>
-dyn_optional<T>::~dyn_optional() {
+~dyn_optional() {
     delete ptr;
 }
 ```
@@ -238,9 +238,20 @@ dyn_optional<T>::~dyn_optional() {
 
 ## Memory allocation and deallocation
 
-We used `new` to allocate memory for the value in `dyn_optional` and `delete` to deallocate it.
+We used `new` to allocate memory and to construct an object:
 
-But what if we need finer control and more flexibility over memory allocation and deallocation; or object creation and destruction?
+```cpp
+ptr = new T(*other.ptr);
+```
+
+We used `delete` to destroy the object and deallocate the memory:
+
+```cpp
+delete ptr;
+```
+
+What if we need finer control over memory allocation and deallocation
+(or object creation and destruction)?
 
 ---
 
@@ -253,6 +264,23 @@ type, and a place to return that memory to once it is no longer needed._
 Allocators provide a more granular way to manage memory than `new` and `delete`.
 
 Allocators separate allocation and construction, and deallocation and destruction.
+
+---
+
+## A brief history of allocators
+
+Allocators were added to C++ as part of the STL to allow custom memory management.
+
+```cpp
+std::vector<T, A=std::allocator<T>>
+```
+
+Before C++11, an allocator was a lightweight handle with a set of member functions
+that affected how an object was constructed and destroyed, and how memory was
+allocated and deallocated from some global resource.
+
+C++11 introduced a more sophisticated model of allocators where allocators could
+contain state and were interacted with through allocator traits.
 
 ---
 
@@ -330,23 +358,6 @@ Perhaps you are copying your friend's red house and need to use your supply of r
 We must sure that when the models are taken apart, the bricks are returned to the correct box.
 
 ![bg right](images/two-houses.png)
-
----
-
-## A brief history of allocators
-
-Allocators were added to C++ as part of the STL to allow custom memory management.
-
-```cpp
-std::vector<T, A=std::allocator<T>>
-```
-
-Before C++11, an allocator was a lightweight handle to a set of member functions
-that affected how an object was constructed and destroyed, and how memory was
-allocated and deallocated from some global resource.
-
-C++11 introduced a more sophisticated model of allocators where allocators could
-contain state and were interacted with through allocator traits.
 
 ---
 
