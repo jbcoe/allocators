@@ -236,12 +236,11 @@ dyn_optional<T>::~dyn_optional() {
 
 ---
 
-## Object creation and memory allocation
+## Memory allocation and deallocation
 
 We used `new` to allocate memory for the value in `dyn_optional` and `delete` to deallocate it.
 
-But what if we need finer control and more flexibility over memory allocation and deallocation,
-or object creation and destruction?
+But what if we need finer control and more flexibility over memory allocation and deallocation; or object creation and destruction?
 
 ---
 
