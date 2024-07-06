@@ -114,6 +114,10 @@ TEST(TestUtilities, NonPropagatingAllocator) {
 // Default Allocator Tests.
 //
 
+//
+// Default Allocator Tests.
+//
+
 TEST(DynOptionalDefaultAllocator, DefaultConstruct) {
   dyn_optional<int> opt;
   EXPECT_FALSE(opt);
