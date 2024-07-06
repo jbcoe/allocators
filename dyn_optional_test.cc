@@ -104,18 +104,12 @@ TEST(TestUtilities, NonPropagatingAllocator) {
   EXPECT_EQ(NonPropagatingAllocator<int>::default_construct_count, 2);
 }
 
+//
+// Default Allocator Tests.
+//
+
 TEST(DynOptionalDefaultAllocator, DefaultConstruct) {
   dyn_optional<int> opt;
-  EXPECT_FALSE(opt);
-}
-
-TEST(DynOptionalPropagatingAllocator, DefaultConstruct) {
-  dyn_optional<int, NonPropagatingAllocator<int>> opt;
-  EXPECT_FALSE(opt);
-}
-
-TEST(DynOptionalNonPropagatingAllocator, DefaultConstruct) {
-  dyn_optional<int, NonPropagatingAllocator<int>> opt;
   EXPECT_FALSE(opt);
 }
 
@@ -125,10 +119,28 @@ TEST(DynOptionalDefaultAllocator, ValueConstruct) {
   EXPECT_EQ(*opt, 42);
 }
 
+//
+// Propagating Allocator Tests.
+//
+
+TEST(DynOptionalPropagatingAllocator, DefaultConstruct) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt;
+  EXPECT_FALSE(opt);
+}
+
 TEST(DynOptionalPropagatingAllocator, ValueConstruct) {
   dyn_optional<int, NonPropagatingAllocator<int>> opt(42);
   EXPECT_TRUE(opt);
   EXPECT_EQ(*opt, 42);
+}
+
+//
+// NonPropagating Allocator Tests.
+//
+
+TEST(DynOptionalNonPropagatingAllocator, DefaultConstruct) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt;
+  EXPECT_FALSE(opt);
 }
 
 TEST(DynOptionalNonPropagatingAllocator, ValueConstruct) {
