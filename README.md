@@ -1,4 +1,8 @@
-# Notes, code samples and a presentation about allocators for C++
+# A place to share what I learned about C++ allocators
+
+[![codecov][badge.codecov]][codecov] [![language][badge.language]][language]
+[![license][badge.license]][license] [![issues][badge.issues]][issues]
+[![pre-commit][badge.pre-commit]][pre-commit]
 
 [![codecov][badge.codecov]][codecov] [![language][badge.language]][language]
 [![license][badge.license]][license] [![issues][badge.issues]][issues]
