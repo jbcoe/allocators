@@ -142,19 +142,19 @@ TEST(DynOptionalDefaultAllocator, Swap) {
 //
 
 TEST(DynOptionalPropagatingAllocator, DefaultConstruct) {
-  dyn_optional<int, NonPropagatingAllocator<int>> opt;
+  dyn_optional<int, PropagatingAllocator<int>> opt;
   EXPECT_FALSE(opt);
 }
 
 TEST(DynOptionalPropagatingAllocator, ValueConstruct) {
-  dyn_optional<int, NonPropagatingAllocator<int>> opt(42);
+  dyn_optional<int, PropagatingAllocator<int>> opt(42);
   EXPECT_TRUE(opt);
   EXPECT_EQ(*opt, 42);
 }
 
 TEST(DynOptionalPropagatingAllocator, Swap) {
-  dyn_optional<int, NonPropagatingAllocator<int>> opt1(42);
-  dyn_optional<int, NonPropagatingAllocator<int>> opt2(43);
+  dyn_optional<int, PropagatingAllocator<int>> opt1(42);
+  dyn_optional<int, PropagatingAllocator<int>> opt2(43);
   opt1.swap(opt2);
   EXPECT_EQ(*opt1, 43);
   EXPECT_EQ(*opt2, 42);
