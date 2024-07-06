@@ -27,6 +27,9 @@ repos:
       - id: forbid-submodules
       - id: requirements-txt-fixer
       - id: trailing-whitespace
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
   - repo: https://github.com/pre-commit/mirrors-clang-format
     rev: v18.1.8
     hooks:
