@@ -42,6 +42,9 @@ class PropagatingAllocator {
 
   PropagatingAllocator() { ++default_construct_count; }
 
+  friend auto operator<=>(const PropagatingAllocator&,
+                          const PropagatingAllocator&) = default;
+
   T* allocate(std::size_t n) const {
     std::allocator<T> default_allocator{};
     return default_allocator.allocate(n);
@@ -64,6 +67,9 @@ class NonPropagatingAllocator {
   inline static size_t default_construct_count = 0;
 
   NonPropagatingAllocator() { ++default_construct_count; }
+
+  friend auto operator<=>(const NonPropagatingAllocator&,
+                          const NonPropagatingAllocator&) = default;
 
   NonPropagatingAllocator select_on_container_copy_construction() const {
     return NonPropagatingAllocator();
@@ -119,6 +125,14 @@ TEST(DynOptionalDefaultAllocator, ValueConstruct) {
   EXPECT_EQ(*opt, 42);
 }
 
+TEST(DynOptionalDefaultAllocator, Swap) {
+  dyn_optional<int> opt1(42);
+  dyn_optional<int> opt2(43);
+  opt1.swap(opt2);
+  EXPECT_EQ(*opt1, 43);
+  EXPECT_EQ(*opt2, 42);
+}
+
 //
 // Propagating Allocator Tests.
 //
@@ -132,6 +146,14 @@ TEST(DynOptionalPropagatingAllocator, ValueConstruct) {
   dyn_optional<int, NonPropagatingAllocator<int>> opt(42);
   EXPECT_TRUE(opt);
   EXPECT_EQ(*opt, 42);
+}
+
+TEST(DynOptionalPropagatingAllocator, Swap) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt1(42);
+  dyn_optional<int, NonPropagatingAllocator<int>> opt2(43);
+  opt1.swap(opt2);
+  EXPECT_EQ(*opt1, 43);
+  EXPECT_EQ(*opt2, 42);
 }
 
 //
@@ -148,4 +170,13 @@ TEST(DynOptionalNonPropagatingAllocator, ValueConstruct) {
   EXPECT_TRUE(opt);
   EXPECT_EQ(*opt, 42);
 }
+
+TEST(DynOptionalNonPropagatingAllocator, Swap) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt1(42);
+  dyn_optional<int, NonPropagatingAllocator<int>> opt2(43);
+  opt1.swap(opt2);
+  EXPECT_EQ(*opt1, 43);
+  EXPECT_EQ(*opt2, 42);
+}
+
 }  // namespace

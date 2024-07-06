@@ -202,7 +202,7 @@ class dyn_optional {
   constexpr void swap(dyn_optional& other) noexcept(
       allocator_traits::propagate_on_container_swap::value ||
       allocator_traits::is_always_equal::value) {
-    using namespace std;
+    using std::swap;
     if constexpr (allocator_traits::propagate_on_container_swap::value) {
       swap(allocator_, other.allocator_);
       swap(ptr_, other.ptr_);
