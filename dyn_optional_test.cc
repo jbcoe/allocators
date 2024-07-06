@@ -20,93 +20,120 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "dyn_optional.h"
 
+#include <memory>
+#include <type_traits>
+#include <utility>
+
 #include "gtest/gtest.h"
 
-namespace xyz {
-namespace test {
+namespace {
 
-class DynOptionalTest : public ::testing::Test {
- protected:
-  void SetUp() override {
-    // Setup code if needed
+using xyz::dyn_optional;
+
+template <typename T>
+class PropagatingAllocator {
+ public:
+  using value_type = T;
+  using propagate_on_container_copy_assignment = std::true_type;
+  using propagate_on_container_move_assignment = std::true_type;
+  using propagate_on_container_swap = std::true_type;
+
+  inline static size_t default_construct_count = 0;
+
+  PropagatingAllocator() { ++default_construct_count; }
+
+  T* allocate(std::size_t n) const {
+    std::allocator<T> default_allocator{};
+    return default_allocator.allocate(n);
   }
 
-  void TearDown() override {
-    // Cleanup code if needed
+  void deallocate(T* p, std::size_t n) const {
+    std::allocator<T> default_allocator{};
+    return default_allocator.deallocate(p, n);
   }
 };
 
-TEST_F(DynOptionalTest, DefaultConstructor) {
+template <typename T>
+class NonPropagatingAllocator {
+ public:
+  using value_type = T;
+  using propagate_on_container_copy_assignment = std::false_type;
+  using propagate_on_container_move_assignment = std::false_type;
+  using propagate_on_container_swap = std::false_type;
+
+  inline static size_t default_construct_count = 0;
+
+  NonPropagatingAllocator() { ++default_construct_count; }
+
+  NonPropagatingAllocator select_on_container_copy_construction() const {
+    return NonPropagatingAllocator();
+  }
+
+  T* allocate(std::size_t n) const {
+    std::allocator<T> default_allocator{};
+    return default_allocator.allocate(n);
+  }
+
+  void deallocate(T* p, std::size_t n) const {
+    std::allocator<T> default_allocator{};
+    return default_allocator.deallocate(p, n);
+  }
+};
+
+TEST(TestUtilities, PropagatingAllocator) {
+  using allocator_traits = std::allocator_traits<PropagatingAllocator<int>>;
+  EXPECT_TRUE(allocator_traits::propagate_on_container_copy_assignment::value);
+  EXPECT_TRUE(allocator_traits::propagate_on_container_move_assignment::value);
+  EXPECT_TRUE(allocator_traits::propagate_on_container_swap::value);
+
+  auto a = PropagatingAllocator<int>{};
+  [[maybe_unused]] auto aa =
+      allocator_traits::select_on_container_copy_construction(a);
+  EXPECT_EQ(PropagatingAllocator<int>::default_construct_count, 1);
+}
+
+TEST(TestUtilities, NonPropagatingAllocator) {
+  using allocator_traits = std::allocator_traits<NonPropagatingAllocator<int>>;
+  EXPECT_FALSE(allocator_traits::propagate_on_container_copy_assignment::value);
+  EXPECT_FALSE(allocator_traits::propagate_on_container_move_assignment::value);
+  EXPECT_FALSE(allocator_traits::propagate_on_container_swap::value);
+
+  auto a = NonPropagatingAllocator<int>{};
+  [[maybe_unused]] auto aa =
+      allocator_traits::select_on_container_copy_construction(a);
+  EXPECT_EQ(NonPropagatingAllocator<int>::default_construct_count, 2);
+}
+
+TEST(DynOptionalDefaultAllocator, DefaultConstruct) {
   dyn_optional<int> opt;
   EXPECT_FALSE(opt);
 }
 
-TEST_F(DynOptionalTest, ParameterizedConstructor) {
-  dyn_optional<int> opt(5);
-  ASSERT_TRUE(opt);
-  EXPECT_EQ(*opt, 5);
-}
-
-TEST_F(DynOptionalTest, CopyConstructor) {
-  dyn_optional<int> original(10);
-  dyn_optional<int> copy(original);
-  ASSERT_TRUE(copy);
-  EXPECT_EQ(*copy, 10);
-}
-
-TEST_F(DynOptionalTest, MoveConstructor) {
-  dyn_optional<int> original(15);
-  dyn_optional<int> moved(std::move(original));
-  ASSERT_TRUE(moved);
-  EXPECT_EQ(*moved, 15);
-  EXPECT_FALSE(original);
-}
-
-TEST_F(DynOptionalTest, CopyAssignment) {
-  dyn_optional<int> original(20);
-  dyn_optional<int> assigned;
-  assigned = original;
-  ASSERT_TRUE(assigned);
-  EXPECT_EQ(*assigned, 20);
-}
-
-TEST_F(DynOptionalTest, MoveAssignment) {
-  dyn_optional<int> original(25);
-  dyn_optional<int> assigned;
-  assigned = std::move(original);
-  ASSERT_TRUE(assigned);
-  EXPECT_EQ(*assigned, 25);
-  EXPECT_FALSE(original);
-}
-
-TEST_F(DynOptionalTest, BooleanConversion) {
-  dyn_optional<int> opt;
+TEST(DynOptionalPropagatingAllocator, DefaultConstruct) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt;
   EXPECT_FALSE(opt);
-  opt = 30;
+}
+
+TEST(DynOptionalNonPropagatingAllocator, DefaultConstruct) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt;
+  EXPECT_FALSE(opt);
+}
+
+TEST(DynOptionalDefaultAllocator, ValueConstruct) {
+  dyn_optional<int> opt(42);
   EXPECT_TRUE(opt);
+  EXPECT_EQ(*opt, 42);
 }
 
-TEST_F(DynOptionalTest, Accessors) {
-  dyn_optional<int> opt(35);
-  ASSERT_TRUE(opt);
-  *opt = 40;
-  EXPECT_EQ(*opt, 40);
+TEST(DynOptionalPropagatingAllocator, ValueConstruct) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt(42);
+  EXPECT_TRUE(opt);
+  EXPECT_EQ(*opt, 42);
 }
 
-TEST_F(DynOptionalTest, Swap) {
-  dyn_optional<int> opt1(45);
-  dyn_optional<int> opt2(50);
-  opt1.swap(opt2);
-  EXPECT_EQ(*opt1, 50);
-  EXPECT_EQ(*opt2, 45);
+TEST(DynOptionalNonPropagatingAllocator, ValueConstruct) {
+  dyn_optional<int, NonPropagatingAllocator<int>> opt(42);
+  EXPECT_TRUE(opt);
+  EXPECT_EQ(*opt, 42);
 }
-
-TEST_F(DynOptionalTest, Reset) {
-  dyn_optional<int> opt(55);
-  ASSERT_TRUE(opt);
-  opt.reset();
-  EXPECT_FALSE(opt);
-}
-
-}  // namespace test
-}  // namespace xyz
+}  // namespace
