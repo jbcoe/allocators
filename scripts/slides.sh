@@ -9,5 +9,5 @@
 
 cd $(dirname $(dirname "$0"))
 set -x
-marp TALK.md --allow-local-files --html -o TALK.pdf
-marp TALK.md --allow-local-files --html -o TALK.html
+marp talks/cpp_on_sea_2024.md --allow-local-files --html -o cpp_on_sea_2024.pdf
+marp talks/cpp_on_sea_2024.md --allow-local-files --html -o cpp_on_sea_2024.html

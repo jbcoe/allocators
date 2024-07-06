@@ -9,6 +9,6 @@ build*/
 out/
 .cache
 MODULE.bazel.lock
-TALK.pdf
 value_types.cc
-TALK.html
+talks/cpp_on_sea_2024.pdf
+talks/cpp_on_sea_2024.html
