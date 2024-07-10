@@ -4,10 +4,6 @@
 [![license][badge.license]][license] [![issues][badge.issues]][issues]
 [![pre-commit][badge.pre-commit]][pre-commit]
 
-[![codecov][badge.codecov]][codecov] [![language][badge.language]][language]
-[![license][badge.license]][license] [![issues][badge.issues]][issues]
-[![pre-commit][badge.pre-commit]][pre-commit]
-
 [badge.language]: https://img.shields.io/badge/language-C%2B%2B14-yellow.svg
 [badge.codecov]: https://img.shields.io/codecov/c/github/jbcoe/allocators/master.svg?logo=codecov
 [badge.license]: https://img.shields.io/badge/license-MIT-blue.svg
